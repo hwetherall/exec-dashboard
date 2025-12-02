@@ -13,6 +13,10 @@ const icons = {
     overview: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
     chapter: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>`,
     risk: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
+    checkmark: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`,
+    grid: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
+    message: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`,
+    target: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>`,
     logo: `<img src="assets/kajima-logo.png" alt="Kajima Logo" class="logo-img">`
 };
 
@@ -84,6 +88,10 @@ function renderSidebar(data) {
             items: [{ id: "executive-summary", label: "Executive Summary", icon: icons.overview }],
         },
         {
+            label: "Planning",
+            items: [{ id: "hypothesis-tracker", label: "Hypothesis Tracker", icon: icons.target }],
+        },
+        {
             label: "Chapters",
             items: data.chapters.map((chapter) => ({
                 id: chapter.id,
@@ -94,6 +102,14 @@ function renderSidebar(data) {
         {
             label: "Risk",
             items: [{ id: "six-t-risk", label: "6T Risk Matrix", icon: icons.risk }],
+        },
+        {
+            label: "Decision Lens",
+            items: [
+                { id: "lens-belief", label: "Belief Check", icon: icons.checkmark },
+                { id: "lens-strategy", label: "Strategy Matrix", icon: icons.grid },
+                { id: "lens-debate", label: "Debate Club", icon: icons.message },
+            ],
         },
     ];
 
@@ -140,6 +156,28 @@ function handleNavigation(targetId, data) {
 
     if (targetId === "six-t-risk") {
         renderRiskMatrixSection(data);
+        return;
+    }
+
+    if (targetId === "lens-belief") {
+        renderBeliefLens(data);
+        return;
+    }
+
+    if (targetId === "lens-strategy") {
+        renderStrategicLens(data);
+        return;
+    }
+
+    if (targetId === "lens-debate") {
+        renderDebateClub(data);
+        return;
+    }
+
+    if (targetId === "hypothesis-tracker") {
+        triggerAnimation();
+        destroyActiveCharts();
+        HypothesisTracker.render();
         return;
     }
 
@@ -790,6 +828,11 @@ function renderChapter(chapter) {
     `;
 
     initCharts(chartMounts);
+
+    // Initialize Sensitivity Panel for Financial chapter
+    if (chapter.id === 'financial-operational' && window.initSensitivityPanel) {
+        window.initSensitivityPanel('contentContainer');
+    }
 }
 
 function renderMetrics(metrics) {
@@ -891,6 +934,199 @@ window.toggleRiskView = function(view, canvasId) {
 
 // Store sixTs data globally for chart initialization
 let currentSixTs = null;
+
+function renderBeliefLens(data) {
+    triggerAnimation();
+    destroyActiveCharts();
+    const container = document.getElementById("contentContainer");
+    const beliefs = data.decisionFrameworks.beliefLens || [];
+
+    const beliefCards = beliefs
+        .map(
+            (belief) => {
+                const statusClass = belief.status.toLowerCase().replace(/\s+/g, '-');
+                return `
+                <div class="belief-card ${statusClass}">
+                    <div class="belief-card-header">
+                        <div class="belief-checkbox">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                        <div class="belief-title-group">
+                            <h3 class="belief-title">${belief.belief}</h3>
+                            <span class="belief-status-badge ${statusClass}">${belief.status}</span>
+                        </div>
+                    </div>
+                    <p class="belief-statement">${belief.statement}</p>
+                </div>
+            `;
+            }
+        )
+        .join("");
+
+    container.innerHTML = `
+        <section class="chapter-header">
+            <p class="eyebrow">Decision Lens</p>
+            <h2 class="chapter-title">Belief Check</h2>
+            <p class="chapter-summary">Critical assumptions that must be validated before proceeding. Each belief represents a key hypothesis about market behavior, technology feasibility, or competitive advantage.</p>
+        </section>
+        <div class="belief-lens-container">
+            ${beliefCards}
+        </div>
+    `;
+}
+
+function renderStrategicLens(data) {
+    triggerAnimation();
+    destroyActiveCharts();
+    const container = document.getElementById("contentContainer");
+    const strategic = data.decisionFrameworks.strategicLens || {};
+
+    const shouldWe = strategic.shouldWe || {};
+    const canWe = strategic.canWe || {};
+
+    // Calculate matrix position based on ratings (simplified logic)
+    const shouldWeValue = shouldWe.rating && shouldWe.rating.includes("High") ? 75 : shouldWe.rating && shouldWe.rating.includes("Medium") ? 50 : 25;
+    const canWeValue = canWe.rating && (canWe.rating.includes("Yes") || canWe.rating.includes("High")) ? 75 : canWe.rating && (canWe.rating.includes("No") || canWe.rating.includes("Low")) ? 25 : 50;
+
+    container.innerHTML = `
+        <section class="chapter-header">
+            <p class="eyebrow">Decision Lens</p>
+            <h2 class="chapter-title">Strategy Matrix</h2>
+            <p class="chapter-summary">A 2x2 framework evaluating both strategic fit ("Should We?") and execution capability ("Can We?") to determine the optimal path forward.</p>
+        </section>
+
+        <section class="content-block">
+            <h3>Can We / Should We Matrix</h3>
+            <div class="matrix-container">
+                <div class="matrix-grid-wrapper">
+                    <div class="matrix-axis-y"><span>Strategic Fit (Should We?)</span></div>
+                    <div class="matrix-2x2">
+                        <div class="quadrant top-left">
+                            <span class="quadrant-label">Strategy without Capability</span>
+                        </div>
+                        <div class="quadrant top-right">
+                            <span class="quadrant-label">Clear Winner</span>
+                        </div>
+                        <div class="quadrant bottom-left">
+                            <span class="quadrant-label">No Go</span>
+                        </div>
+                        <div class="quadrant bottom-right">
+                            <span class="quadrant-label">Execution without Strategy</span>
+                        </div>
+                        
+                        <!-- Dynamic Marker -->
+                        <div class="matrix-marker-dot" style="top: ${100 - shouldWeValue}%; left: ${canWeValue}%;">
+                            <div class="marker-label">You Are Here</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="matrix-axis-x"><span>Execution Capacity (Can We?)</span></div>
+            </div>
+        </section>
+
+        <section class="content-block">
+            <h3>Should We Do It?</h3>
+            <div class="strategy-rating-card">
+                <div class="strategy-rating-header">
+                    <span class="strategy-rating-badge">${shouldWe.rating || "N/A"}</span>
+                </div>
+                <p class="strategy-rationale">${shouldWe.rationale || ""}</p>
+                <div class="strategy-dimensions-grid">
+                    ${(shouldWe.dimensions || []).map(dim => `
+                        <div class="strategy-dimension">
+                            <div class="dimension-header">
+                                <span class="dimension-label">${dim.label}</span>
+                                <span class="dimension-value ${dim.value.toLowerCase()}">${dim.value}</span>
+                            </div>
+                            <p class="dimension-text">${dim.text}</p>
+                        </div>
+                    `).join("")}
+                </div>
+            </div>
+        </section>
+
+        <section class="content-block">
+            <h3>Can We Do It?</h3>
+            <div class="strategy-rating-card">
+                <div class="strategy-rating-header">
+                    <span class="strategy-rating-badge">${canWe.rating || "N/A"}</span>
+                </div>
+                <p class="strategy-rationale">${canWe.rationale || ""}</p>
+                <div class="strategy-dimensions-grid">
+                    ${(canWe.dimensions || []).map(dim => `
+                        <div class="strategy-dimension">
+                            <div class="dimension-header">
+                                <span class="dimension-label">${dim.label}</span>
+                                <span class="dimension-value ${dim.value.toLowerCase()}">${dim.value}</span>
+                            </div>
+                            <p class="dimension-text">${dim.text}</p>
+                        </div>
+                    `).join("")}
+                </div>
+            </div>
+        </section>
+    `;
+}
+
+function renderDebateClub(data) {
+    triggerAnimation();
+    destroyActiveCharts();
+    const container = document.getElementById("contentContainer");
+    const debate = data.decisionFrameworks.debateClub || [];
+
+    const messages = debate
+        .map((item) => {
+            const isInnovationHawk = item.persona === "The Innovation Hawk";
+            const messageClass = isInnovationHawk ? "user" : "assistant";
+            const bubbleClass = isInnovationHawk ? "blue" : item.persona === "The Risk Hawk" ? "red" : "gray";
+            
+            return `
+                <div class="debate-message ${messageClass}">
+                    <div class="debate-avatar ${bubbleClass}">
+                        ${item.persona.charAt(0)}
+                    </div>
+                    <div class="debate-message-body">
+                        <div class="debate-message-header">
+                            <span class="debate-persona">${item.persona}</span>
+                            <span class="debate-role">${item.role}</span>
+                        </div>
+                        <div class="debate-bubble ${bubbleClass}">
+                            <p>${item.text}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        })
+        .join("");
+
+    container.innerHTML = `
+        <section class="chapter-header">
+            <p class="eyebrow">Decision Lens</p>
+            <h2 class="chapter-title">Debate Club</h2>
+            <p class="chapter-summary">A simulated dialogue between key stakeholders, capturing the real tensions and trade-offs in this decision. Each persona represents a different perspective on risk, opportunity, and execution.</p>
+        </section>
+
+        <div class="debate-club-container">
+            <div class="debate-messages">
+                ${messages}
+            </div>
+            <div class="debate-input-area">
+                <div class="debate-input-wrapper">
+                    <input type="text" class="debate-input" placeholder="Add your perspective to the debate..." disabled>
+                    <button class="debate-send-btn" disabled>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+                <p class="debate-input-hint">This is a read-only view of the debate. Input functionality coming soon.</p>
+            </div>
+        </div>
+    `;
+}
 
 function renderRiskMatrixSection(data) {
     triggerAnimation();

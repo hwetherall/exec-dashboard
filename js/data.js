@@ -14,7 +14,7 @@ const memoData = {
         {
             label: "Global TAM",
             value: "$438B",
-            helper: "CAGR 15.8%"
+            helper: "CAGR 15.8% (Wellness Real Estate)"
         },
         {
             label: "Japan SOM",
@@ -24,11 +24,11 @@ const memoData = {
         {
             label: "Rent Premium",
             value: "4.4%–7.7%",
-            helper: "For Healthy Buildings"
+            helper: "Benchmark for Healthy Buildings"
         },
         {
             label: "Validation Budget",
-            value: "¥25M–¥30M",
+            value: "¥30M",
             helper: "120-Day Pilot Phase"
         },
         {
@@ -37,305 +37,345 @@ const memoData = {
             helper: "B2B Enterprise Sales"
         },
         {
-            label: "Target Margin",
-            value: "20%+",
-            helper: "Operating Margin (Year 3)"
-        }
-    ],
-    executiveSummary: {
-        strategicGoal: "This decision review evaluates whether Kajima should proceed with pilot deployment and phased commercialization of its well-being building technologies.",
-        recommendation: {
-            title: "Phased Go — Pilot-First Commercialization",
-            detail: "Kajima should proceed with a Phased Go — pilot-first commercialization — prioritizing Premium Corporate Offices as the entry segment. This measured approach balances significant market opportunity against unproven commercial viability and technical integration challenges."
+            label: "Target Premium",
+            value: "15%",
+            helper: "Required for Unit Economics"
         },
-        short: "The initiative addresses a high-growth market ($438B) with a strategic 'Bio-Adaptive' solution. However, execution is high-risk due to a lack of digital capability and commercial validation. Recommendation is a Phased Go to validate willingness-to-pay and regulatory compliance before scaling.",
-        long: "This initiative proposes transitioning Kajima from a general contractor to a performance-based provider by integrating proprietary architectural design with biometric sensing to guarantee occupant health outcomes. Given the high execution risks and lack of commercial validation, the recommendation is a Phased Go to test willingness-to-pay and regulatory compliance before full-scale investment. The immediate priority is a 120-day 'hostile validation' phase to secure a binding Letter of Intent.",
-        highlights: [
+    ],
+    decisionFrameworks: {
+        beliefLens: [
             {
-                title: "Strategic Opportunity",
-                detail: "Leverages 'Japan-first' footprint to capture post-pandemic 'flight to quality' and escape commodity margins."
+                belief: "Willingness to Pay",
+                statement: "We believe corporate tenants will pay a 15% CapEx premium for 'biological outcomes' (e.g., lower stress), not just for the 'WELL Certified' plaque.",
+                status: "Unproven"
             },
             {
-                title: "Market Tailwinds",
-                detail: "Global wellness real estate market growing at 15.8%, driven by corporate demand for productivity."
+                belief: "Regulatory Viability",
+                statement: "We believe we can legally deploy AI cameras and biometric sensors in Japanese offices under APPI without triggering a privacy backlash or liability crisis.",
+                status: "High Risk"
             },
             {
-                title: "Unique Solution",
-                detail: "'Bio-Adaptive' closed-loop system measures and adjusts environments in real-time, addressing the 'performance gap'."
+                belief: "Causal Validity",
+                statement: "We believe our 'Bio-Adaptive' algorithms can prove that the building *caused* the productivity increase, differentiating us from commodity sensors.",
+                status: "In Lab Validation"
+            },
+            {
+                belief: "Technology Curator",
+                statement: "We believe we can integrate third-party sensors (Honeywell/Sony) better than the vendors themselves, avoiding the 'Zombie Tech' obsolescence trap.",
+                status: "Assumption"
             }
         ],
+        strategicLens: {
+            shouldWe: {
+                rating: "Borderline (Medium Confidence)",
+                rationale: "The market size ($438B) and 'Flight to Quality' trend are perfect fits for Kajima's strategy to escape commodity construction. However, the product-market fit for a high-cost, privacy-invasive solution is unproven against cheaper software retrofits.",
+                dimensions: [
+                    { label: "Prize", value: "High", text: "$1.1T market by 2029." },
+                    { label: "Fit", value: "High", text: "Aligns with pivot to Services." },
+                    { label: "Advantage", value: "Medium", text: "Hardware integration is unique but slow." }
+                ]
+            },
+            canWe: {
+                rating: "No (High Confidence on Digital)",
+                rationale: "We have the hard assets (cash, R&D labs, client access) but lack the critical soft assets (Medical leadership, SaaS product DNA). We are a builder trying to be a software company.",
+                dimensions: [
+                    { label: "Hard Assets", value: "Yes", text: "Strong balance sheet & R&D facilities." },
+                    { label: "Market Access", value: "Yes", text: "Deep ties with Tier-1 developers." },
+                    { label: "Soft Assets", value: "No", text: "Missing CMO & Head of Product." }
+                ]
+            }
+        },
+        debateClub: [
+            {
+                persona: "The Innovation Hawk",
+                role: "Strategy Lead",
+                text: "Look, if we don't do this, we're just pouring concrete for the next 50 years while margins shrink. The 'Flight to Quality' is real. Tenants are begging for offices that make people want to commute. We own the building; we should own the data layer."
+            },
+            {
+                persona: "The Operator",
+                role: "Construction GM",
+                text: "Tenants beg for 'wellness' until they see the bill. You want to add 15% to the construction cost for sensors that will be obsolete in 3 years? That's 'Zombie Tech'. And who manages the software updates? My site foremen? We don't have the people."
+            },
+            {
+                persona: "The Risk Hawk",
+                role: "Legal Counsel",
+                text: "Forget the cost. You want to put AI cameras tracking 'stress' in a Japanese office? One APPI privacy lawsuit and our brand is toxic. Unless you can prove this works without facial recognition, it's a non-starter."
+            },
+            {
+                persona: "The Innovation Hawk",
+                role: "Strategy Lead",
+                text: "That's why we do the 'Trojan Horse' pilot. We test it in *our* HQ first. If we can prove it lowers sick days by 10%, the privacy concerns vanish because the ROI is undeniable. We can't be afraid of the future."
+            }
+        ]
+    },
+    executiveSummary: {
+        short: "This decision review evaluates whether Kajima should proceed with pilot deployment and phased commercialization of its well-being building technologies. The initiative targets the $438B global wellness real estate market but faces significant execution risks regarding digital capabilities and privacy regulations.",
+        strategicGoal: "Evaluate whether Kajima should proceed with pilot deployment and phased commercialization of the 'Bio-Adaptive' building platform to capture the wellness real estate opportunity.",
+        recommendation: {
+            title: "Phased Go (Conditional)",
+            detail: "Proceed with a 120-day internal pilot to validate core technology claims and privacy compliance, contingent on securing external legal opinion on APPI requirements and at least one Letter of Intent from a non-Kajima client."
+        },
         keyOpportunities: [
             {
-                title: "Premium Market Position",
-                detail: "First-mover advantage in Japan's $1.5B-$3.0B wellness real estate segment with verifiable outcomes."
+                title: "Market Timing",
+                detail: "Post-pandemic 'Flight to Quality' trend creates unprecedented demand for differentiated office spaces."
             },
             {
-                title: "Recurring Revenue Model",
-                detail: "Shift from one-time construction to SaaS-like monitoring contracts with 20%+ margins."
+                title: "Vertical Integration",
+                detail: "Unique position as builder + technology provider enables embedded solutions competitors cannot replicate."
             },
             {
-                title: "Corporate Wellness Tailwind",
-                detail: "Post-pandemic 'flight to quality' and ESG mandates driving demand for healthy buildings."
+                title: "Data Moat",
+                detail: "First-mover advantage in collecting building-occupant biometric correlations creates defensible IP."
             }
+        ],
+        highlights: [
+            {
+                title: "Strategic Fit",
+                detail: "Aligned with corporate goal to transition from 'Asset Delivery' to 'Service Delivery'. Captures the post-pandemic 'Flight to Quality'.",
+            },
+            {
+                title: "Differentiation",
+                detail: "Unique 'Bio-Adaptive' loop links physical design (Space) with biometric data (Psychology), a claim competitors cannot easily match.",
+            },
+            {
+                title: "Hard Asset Advantage",
+                detail: "Leverages Kajima's 'Japan-first' footprint and R&D facilities (ST1-ST6) to prototype faster than software startups.",
+            },
         ],
         watchouts: [
-            "Regulatory Showstopper: Japan's APPI privacy laws regarding biometric data may block deployment.",
-            "Split-Incentive: Developers pay CapEx, tenants reap OpEx benefits; value attribution is difficult.",
-            "Talent Gap: Critical lack of Chief Medical Officer and Head of Product to validate claims and manage software."
+            "Regulatory Showstopper: APPI privacy laws regarding biometric data could render the core tech undeployable.",
+            "Commercial Gap: Zero validated willingness-to-pay for the 15% premium; split-incentive problem remains unsolved.",
+            "Capability Mismatch: Critical lack of Digital Product and Medical leadership to execute a SaaS/Data business.",
         ],
         matrix: {
-            canWeDoIt: "No (High confidence)",
-            shouldWeDoIt: "Borderline (Medium confidence)",
-            canWeDoItText: "Kajima excels at physical execution (Architecture) but lacks the digital DNA and scientific authority to build/sell a biometric SaaS platform.",
-            shouldWeDoItText: "Market size ($438B) and trend alignment are compelling, but product-market fit for a high-CapEx, proprietary hardware solution is unproven."
+            canWeDoIt: "Low (Digital Gap)",
+            shouldWeDoIt: "Borderline (Unproven WTP)",
+            canWeDoItText: "We can build the hardware, but we lack the 'Software DNA' and medical authority to sell the outcome.",
+            shouldWeDoItText: "The market is attractive, but the specific product-market fit for a high-privacy, high-cost solution is theoretical.",
         }
     },
-    capabilityGaps: [
-        {
-            role: "Chief Medical Officer (CMO)",
-            severity: "urgent",
-            reason: "Required to validate health claims and provide scientific credibility for biometric wellness platform."
-        },
-        {
-            role: "Head of Product",
-            severity: "urgent",
-            reason: "Critical for software/SaaS product management — currently no digital product DNA in organization."
-        },
-        {
-            role: "Privacy/Compliance Lead",
-            severity: "important",
-            reason: "APPI biometric data compliance requires specialized expertise not present in current team."
-        },
-        {
-            role: "Data Science Team",
-            severity: "important",
-            reason: "Bio-algorithmic layer (TRL 4-5) needs dedicated ML/data engineering capability."
-        }
-    ],
     riskAnalysis: {
-        overall: "High-Risk, High-Complexity venture. Potential reward is outweighed by structural barriers (privacy, split-incentive) and capability gaps. Requires strict validation gates.",
-        topRisks: [
-            {
-                title: "Regulatory Viability (APPI)",
-                detail: "Collection of biometric/physiological data faces strict privacy hurdles in corporate environments."
-            },
-            {
-                title: "Zero Commercial Validation",
-                detail: "No paying customers or signed pilots to validate willingness-to-pay for the hardware premium."
-            },
-            {
-                title: "Capability & Culture Mismatch",
-                detail: "Organization lacks 'Digital Product' DNA; missing critical Medical/Product leadership."
-            }
-        ],
+        overall: "High-risk, High-reward venture. The physical execution is low-risk, but the digital and commercial execution faces structural barriers (Privacy, Pricing, Talent).",
         sixTs: [
             {
                 title: "Team",
                 severity: "high",
-                rating: "High Risk",
-                summary: "Strong engineering but critical gaps in medical science and digital product leadership."
+                rating: "Critical Gap",
+                summary: "Strong engineering, but missing Chief Medical Officer and Head of Product. 'Hardware-Software Asymmetry' risk.",
             },
             {
                 title: "TAM",
                 severity: "medium",
                 rating: "Constrained",
-                summary: "Large global market ($438B) but 'premium' segment constrained by split-incentive economics."
+                summary: "$438B Global market, but addressable market is limited by the 'split-incentive' problem in commercial leases.",
             },
             {
                 title: "Technology",
                 severity: "high",
                 rating: "Obsolescence",
-                summary: "Embedded proprietary sensors (3-5 yr life) in 50-yr buildings creates 'Zombie Tech' liability."
+                summary: "Embedding 3-year sensors in 50-year buildings creates 'Zombie Tech' liability. Integration is complex.",
             },
             {
                 title: "Traction",
                 severity: "high",
                 rating: "Zero",
-                summary: "Advanced prototypes (K/Park) exist, but zero external commercial customers or revenue."
+                summary: "Advanced prototypes (K/Park), but zero paying external customers. Validation is purely internal.",
             },
             {
                 title: "Trends",
                 severity: "medium",
                 rating: "Mixed",
-                summary: "Wellness demand is high, but Privacy/Surveillance pushback is a major headwind."
+                summary: "Tailwind: Wellness demand. Headwind: Privacy regulation (APPI/GDPR) against surveillance.",
             },
             {
                 title: "Terms",
-                severity: "high",
-                rating: "Misaligned",
-                summary: "Construction governance stifles agile innovation; J-curve economics clash with low margins."
+                severity: "low",
+                rating: "Internal",
+                summary: "Corporate funded. Primary risk is internal transfer pricing and R&D allocation, not external deal terms.",
+            },
+        ],
+        topRisks: [
+            {
+                title: "APPI Privacy Compliance",
+                detail: "Biometric data collection under Japan's Act on the Protection of Personal Information could face legal challenges without explicit consent frameworks."
+            },
+            {
+                title: "Technology Obsolescence",
+                detail: "Embedding 3-year tech lifecycle sensors in 50-year buildings creates 'Zombie Tech' liability and upgrade complexity."
+            },
+            {
+                title: "Talent Gap",
+                detail: "Critical absence of Chief Medical Officer and Head of Digital Product to lead the SaaS/data platform vision."
             }
-        ]
+        ],
     },
+    capabilityGaps: [
+        {
+            role: "Chief Medical Officer",
+            severity: "critical",
+            reason: "No internal medical authority to validate health claims or navigate regulatory requirements for biometric interventions."
+        },
+        {
+            role: "Head of Digital Product",
+            severity: "critical",
+            reason: "SaaS/Data platform requires product management DNA that traditional construction firms lack."
+        },
+        {
+            role: "Privacy & Ethics Lead",
+            severity: "high",
+            reason: "APPI compliance and employee surveillance ethics require dedicated expertise not present in current org."
+        }
+    ],
     chapters: [
         {
             id: "market-opportunity",
             title: "Chapter 1: Market Opportunity",
-            summary: "Global wellness real estate market is $438B (15.8% CAGR). Kajima targets the $1.5B-$3.0B Japan premium office segment, driven by a post-pandemic 'flight to quality' and productivity demands.",
+            summary: "The Global Wellness Real Estate market is $438B (15.8% CAGR), far outpacing general construction (5.1%). Kajima targets the 'Premium Commercial Office' segment in Japan ($1.5B-$3.0B SAM), driven by the post-pandemic 'Flight to Quality'.",
             keyMetrics: [
-                { label: "Global TAM", value: "$438B", description: "15.8% CAGR (2023-2028)" },
-                { label: "Japan SOM", value: "$1.5B+", description: "Premium Office Construction" },
-                { label: "Rent Premium", value: "4.4-7.7%", description: "Verified market benchmark" }
+                { label: "Global TAM", value: "$438B", description: "Global Wellness Real Estate (GWI)" },
+                { label: "Japan SOM", value: "$3.0B", description: "Serviceable Obtainable Market (Office)" },
+                { label: "Market Growth", value: "15.8%", description: "CAGR (vs 5.1% for Construction)" },
+            ],
+            charts: [
+                {
+                    id: "market-chart",
+                    type: "bar",
+                    title: "Market Size Context (USD Billions)",
+                    labels: ["Global Wellness RE", "Smart Buildings", "Japan Premium Office (SAM)"],
+                    datasets: [
+                        {
+                            label: "Market Size ($B)",
+                            data: [438, 126, 3],
+                            backgroundColor: ["#3b82f6", "#94a3b8", "#ef4444"],
+                        }
+                    ]
+                }
             ],
             contentBlocks: [
                 {
-                    title: "Flight to Quality",
-                    body: "Tenants demand environments that mitigate stress/burnout. Healthy buildings command rent premiums and longer lease terms."
+                    title: "The 'Flight to Quality'",
+                    body: "Tenants are abandoning B-grade stock. The market bifurcates: premium 'Wellness' buildings command rents, while standard buildings face vacancy. Kajima must be on the right side of this split.",
                 },
                 {
-                    title: "Split-Incentive Friction",
-                    body: "Developers bear capital costs while tenants gain productivity. Value capture requires overcoming this structural barrier."
+                    title: "Adoption Curve",
+                    body: "We are in the 'Early Adopter' phase for Bio-Adaptive tech. While 'Wellness' is standard, 'Active Biometric Feedback' is a frontier market.",
                 }
             ]
         },
         {
             id: "competitor-landscape",
             title: "Chapter 2: Competitor Landscape",
-            summary: "Kajima faces a 'Two-Front War': playing catch-up against Tech Giants (Honeywell) owning data, and defending against Domestic GCs (Obayashi/Shimizu) with similar 'smart' narratives.",
+            summary: "Kajima fights a 'Two-Front War'. On one side, Tech Incumbents (Honeywell, Delos) own the data standards. On the other, Domestic GCs (Obayashi, Shimizu) are fast-followers on hardware. Kajima's differentiation is the *integration* of both.",
             keyMetrics: [
-                { label: "Primary Threat", value: "Commoditization", description: "WELL Cert + Sensors = Good Enough" },
-                { label: "Tech Rival", value: "Honeywell", description: "Owns the sensor/data layer" },
-                { label: "Standard", value: "Delos/WELL", description: "74,000+ locations certified" }
+                { label: "Delos/WELL", value: "74k+", description: "Locations Registered/Certified" },
+                { label: "Honeywell", value: "Scale", description: "Dominates Sensors/BMS" },
+                { label: "Kajima", value: "0", description: "Commercial Pilots Signed" },
+            ],
+            tables: [
+                {
+                    title: "Competitive Threat Matrix",
+                    headers: ["Competitor Type", "Who", "Threat Level", "Why"],
+                    rows: [
+                        ["Standard Setters", "Delos (WELL)", "High", "They own the 'Badge'. Customers buy the plaque, not the tech."],
+                        ["Tech Giants", "Honeywell, JCI", "High", "They own the 'Brain'. Their sensors are cheaper and open-platform."],
+                        ["Domestic GCs", "Obayashi, Shimizu", "Medium", "Fast-followers. Can replicate hardware if our IP isn't defensible."]
+                    ]
+                }
             ],
             contentBlocks: [
                 {
-                    title: "The Commoditization Trap",
-                    body: "Competitors can replicate 'wellness' marketing using standard sensors and certifications, undercutting Kajima's high-R&D approach."
-                },
-                {
-                    title: "Differentiation Fragility",
-                    body: "Kajima's only moat is the proprietary logic linking design to physiology. Hardware is a liability, not a differentiator."
+                    title: "The Commoditization Risk",
+                    body: "If 'Wellness' becomes just air quality sensors and lights, Honeywell wins on cost. Kajima must prove that *Architectural* integration drives superior biological outcomes.",
                 }
             ]
         },
         {
             id: "product-technology",
             title: "Chapter 3: Product & Technology",
-            summary: "An integrated 'Bio-Adaptive' platform (ST1-ST6) using proprietary 'WellnessGPT' and sensors. Physical tech is mature (TRL 9), but bio-algorithmic layer (TRL 4-5) lacks causal validation.",
+            summary: "A 'Bio-Adaptive' platform combining 6 R&D streams (ST1-ST6). Mature on hardware (TRL 9), but immature on data logic (TRL 4). Key innovation is the 'WellnessGPT' and closed-loop feedback system.",
             keyMetrics: [
-                { label: "Physical TRL", value: "9", description: "Construction capability is mature" },
-                { label: "Bio-Algo TRL", value: "4-5", description: "Lab validation only; unproven in wild" },
-                { label: "Core Risk", value: "Causality", description: "Link between design & stress relief unproven" }
+                { label: "Physical Tech", value: "TRL 9", description: "Ready (Sky-apier, Sound Aircon)" },
+                { label: "Bio-Logic", value: "TRL 4", description: "In Validation (Causality Unproven)" },
+                { label: "Integration", value: "Med", description: "Depends on 3rd party sensors" },
             ],
-            roadmap: [
+            tables: [
                 {
-                    stage: 1,
-                    title: "Sensor Integration",
-                    timeframe: "Q1-Q2",
-                    actions: "Partner with OEM sensors, reduce proprietary hardware dependency",
-                    active: true
-                },
-                {
-                    stage: 2,
-                    title: "Algorithm Validation",
-                    timeframe: "Q2-Q3",
-                    actions: "Clinical validation of bio-adaptive algorithms with medical oversight",
-                    active: false
-                },
-                {
-                    stage: 3,
-                    title: "Platform MVP",
-                    timeframe: "Q3-Q4",
-                    actions: "WellnessGPT integration, dashboard for real-time monitoring",
-                    active: false
+                    title: "Implementation Roadmap",
+                    headers: ["Phase", "Timeline", "Focus", "Goal"],
+                    rows: [
+                        ["1. Validate", "Days 0-90", "Internal Data", "Prove 'Causality' in Kajima HQ."],
+                        ["2. Pilot", "Months 4-12", "Friendly Client", "Test 'Willingness to Pay'."],
+                        ["3. Scale", "Year 2+", "Commercial", "Standardize offerings."]
+                    ]
                 }
             ],
             contentBlocks: [
                 {
-                    title: "Bio-Adaptive Loop",
-                    body: "Input (Environment) -> Response (Physiology) -> Outcome (Wellness). Requires real-time biometric feedback."
-                },
-                {
-                    title: "Zombie Tech Risk",
-                    body: "Embedded sensors become obsolete in 3-5 years. Strategy must shift to 'Technology Curator' (partnering) vs manufacturing."
+                    title: "The 'Zombie Tech' Risk",
+                    body: "Embedding 3-year sensors into 50-year buildings is dangerous. We must adopt a 'Layered Architecture' where tech can be swapped without construction work.",
                 }
             ]
         },
         {
-            id: "go-to-market",
+            id: "gtm-strategy",
             title: "Chapter 4: Go-To-Market (GTM)",
-            summary: "Strategy utilizes a 'Trojan Horse' retrofit model (Soto-beya®) to enter clients before new construction. Depends on 'Technology Curator' partnership model with IWBI and sensor OEMs.",
+            summary: "Strategy: 'Trojan Horse'. Enter via modular retrofits (Soto-beya) to prove value, then upsell full builds. Execution relies on a 'Technology Curator' model (partnering for sensors) rather than manufacturing.",
             keyMetrics: [
-                { label: "Validation", value: "120 Days", description: "Hostile pilot phase timeframe" },
-                { label: "Target", value: "Corp HQ", description: "Tier 1 Japanese Corporates" },
-                { label: "Strategy", value: "Retrofit First", description: "Bypass 3-5yr construction cycle" }
-            ],
-            roadmap: [
-                {
-                    stage: 1,
-                    title: "Hostile Validation",
-                    timeframe: "Days 1-120",
-                    actions: "Secure binding LOI, validate APPI compliance, recruit CMO",
-                    active: true
-                },
-                {
-                    stage: 2,
-                    title: "Pilot Deployment",
-                    timeframe: "Months 4-9",
-                    actions: "Deploy Soto-beya units, collect biometric data, measure outcomes",
-                    active: false
-                },
-                {
-                    stage: 3,
-                    title: "Commercial Launch",
-                    timeframe: "Year 1-2",
-                    actions: "Scale to 5+ enterprise clients, establish recurring revenue model",
-                    active: false
-                },
-                {
-                    stage: 4,
-                    title: "Platform Expansion",
-                    timeframe: "Year 2-3",
-                    actions: "Integrate full architectural solutions, expand beyond Japan",
-                    active: false
-                }
+                { label: "Strategy", value: "Trojan Horse", description: "Retrofit First, Build Later" },
+                { label: "Model", value: "Curator", description: "Buy Sensors, Build Spaces" },
+                { label: "Partner", value: "IWBI", description: "Keystone Partner for Credibility" },
             ],
             contentBlocks: [
                 {
-                    title: "Trojan Horse Entry",
-                    body: "Deploy modular units (Soto-beya) to generate verified data and build trust before upselling full architectural integration."
+                    title: "Entry Point: The 'Soto-beya' Pod",
+                    body: "A modular recovery room that can be dropped into any office. It generates the biometric data needed to prove the 'Wellness' thesis without a 3-year construction delay.",
                 },
                 {
-                    title: "Partnership Model",
-                    body: "Must secure 'Keystone' partnership with IWBI (WELL) for credibility and sensor OEMs for hardware reliability."
+                    title: "Sales Channel Conflict",
+                    body: "Current sales teams sell 'Square Meters'. This product requires selling 'Productivity'. We need a specialized 'Solution Architect' overlay team.",
                 }
             ]
         },
         {
             id: "financial-operational",
-            title: "Chapter 5: Financial & Operational Health",
-            summary: "Financial model requires a 15-25% market premium to offset high fixed R&D costs. Economics show a 'J-curve' profile with heavy upfront burn and unproven recurring revenue tails.",
+            title: "Chapter 5: Financial & Operational Health (BUNDLED)",
+            summary: "Financials show a 'J-Curve' profile: high upfront R&D/Talent costs with delayed revenue. Success hinges on capturing a 15-25% premium, but the 'Split-Incentive' problem (Developer pays, Tenant gains) puts this at risk.",
             keyMetrics: [
-                { label: "Target Premium", value: "15-25%", description: "Required for model viability" },
-                { label: "Burn Rate", value: "High", description: "Driven by R&D headcount" },
-                { label: "Revenue Mix", value: "Hybrid", description: "CapEx Premium + SaaS OpEx" }
+                { label: "Target Premium", value: "15-25%", description: "Required for Break-even" },
+                { label: "Rent Uplift", value: "4-7%", description: "Market Benchmark (Validated)" },
+                { label: "Gross Margin", value: "Unknown", description: "Heavily dependent on SaaS mix" },
             ],
-            financialData: {
-                unitEconomics: [
-                    { label: "Tech Talent Cost", value: "¥12M-¥25M/yr", note: "Per senior hire" },
-                    { label: "Construction Margin", value: "3-5%", note: "Industry average" },
-                    { label: "Target Margin (Y3)", value: "20%+", note: "With SaaS component" },
-                    { label: "Customer LTV", value: "TBD", note: "Pending validation" }
-                ],
-                revenueModel: [
-                    { label: "CapEx Premium", value: "15-25%", note: "Construction upcharge" },
-                    { label: "SaaS Monitoring", value: "¥X/sqm/mo", note: "Recurring revenue" },
-                    { label: "Data Licensing", value: "TBD", note: "Future revenue stream" }
-                ],
-                keyAssumptions: [
-                    "Willingness-to-pay for premium unverified",
-                    "SaaS adoption rate in J-market unknown",
-                    "Split-incentive resolution required"
-                ]
-            },
+            charts: [
+                {
+                    id: "financial-chart",
+                    type: "line",
+                    title: "Projected Cash Flow Profile (J-Curve)",
+                    labels: ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5"],
+                    datasets: [
+                        {
+                            label: "Cumulative Cash Flow",
+                            data: [-450, -850, -1000, -500, 100], 
+                            borderColor: "#f59e0b",
+                            fill: false,
+                        }
+                    ]
+                }
+            ],
             contentBlocks: [
                 {
-                    title: "Unit Economics",
-                    body: "High-cost tech talent (¥12M-¥25M) inside low-margin construction model creates margin pressure. Needs recurring revenue to survive."
+                    title: "The Split-Incentive Block",
+                    body: "Developers struggle to pass CapEx costs to tenants. We must explore 'Performance Contracting' where we share the risk/reward of rental premiums.",
                 },
                 {
-                    title: "Split-Incentive Risk",
-                    body: "Developer pays CapEx, Tenant gets OpEx benefit. Willingness-to-pay remains the single biggest unverified assumption."
+                    title: "Unit Economics",
+                    body: "Currently inverted. High fixed costs (R&D team) + Low volume. We need to reach 'SaaS-like' recurring revenue to offset the overhead.",
+                }
+            ],
+            callouts: [
+                {
+                    tone: "danger",
+                    text: "Without recurring revenue (Data/SaaS), this is just a lower-margin construction project with higher overhead.",
                 }
             ]
         },
@@ -351,7 +391,7 @@ const memoData = {
             contentBlocks: [
                 {
                     title: "Capability Mismatch",
-                    body: "World-class construction engineering but weak 'Digital Product' DNA. Need to hire external specialized talent."
+                    body: "World-class construction engineering but weak 'Digital Product' DNA. Need to hire external specialized talent.",
                 },
                 {
                     title: "Regulatory Showstopper",

@@ -1,11 +1,16 @@
 /**
- * Application Configuration
- * Note: In production, use environment variables via a backend proxy
+ * Application Configuration Template
+ * 
+ * Copy this file to config.js and add your actual API key.
+ * 
+ * Note: config.js is in .gitignore and will not be committed to version control.
+ * In production, use environment variables via a backend proxy.
  */
 
 const CONFIG = {
     // OpenRouter API Key
-    OPENROUTER_API_KEY: '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',
+    // Get your API key from: https://openrouter.ai/keys
+    OPENROUTER_API_KEY: 'YOUR_API_KEY_HERE',
     
     // Available Models
     MODELS: [
@@ -21,6 +26,12 @@ const CONFIG = {
             name: 'Gemini 3 Pro Preview',
             context: '1M',
             description: 'Large context window'
+        },
+        {
+            id: 'anthropic/claude-sonnet-4',
+            name: 'Claude Sonnet 4',
+            context: '200K',
+            description: 'High quality reasoning model'
         }
     ],
     
