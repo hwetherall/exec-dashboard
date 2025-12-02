@@ -1,498 +1,365 @@
 const memoData = {
     companyInfo: {
-        name: "Avasa Medical",
-        stage: "Series A",
-        industry: "Medical Device / MedTech",
-        location: "Auckland, New Zealand",
-        headline: "Precision arterial couplers that replace 40-minute manual suturing",
-        status: "pass",
-        decision: "Pass – Strategic Mismatch",
-        raiseAmount: "NZ$4.75M Series A",
-        valuationNote: "Funding request leaves ~14 months of runway",
+        name: "Kajima Wellbeing Real Estate Initiative",
+        stage: "Incubation / Seed (Pre-Revenue)",
+        industry: "PropTech / Wellness Real Estate",
+        location: "Tokyo, Japan",
+        headline: "Evaluate whether Kajima should proceed with pilot deployment and phased commercialization of the 'Bio-Adaptive' building platform.",
+        status: "conditional",
+        decision: "Phased Go (Conditional)",
+        raiseAmount: "¥25M–¥30M (Validation Budget)",
+        valuationNote: "Internal Corporate Venture"
     },
     summaryStats: [
         {
-            label: "Funding Ask",
-            value: "NZ$4.75M",
-            helper: "Projected 14-mo runway incl. tax credits",
+            label: "Global TAM",
+            value: "$438B",
+            helper: "CAGR 15.8%"
         },
         {
-            label: "Realistic TAM",
-            value: "US$120M",
-            helper: "Founder claims US$30B (+250x)",
+            label: "Japan SOM",
+            value: "$1.5B–$3.0B",
+            helper: "Class A Office Segment"
         },
         {
-            label: "Procedure Time",
-            value: "-80%",
-            helper: "From 40 min to sub-10 min",
+            label: "Rent Premium",
+            value: "4.4%–7.7%",
+            helper: "For Healthy Buildings"
         },
         {
-            label: "Gross Margin Claim",
-            value: "97-98%",
-            helper: "Benchmark 65-75% for MedTech",
+            label: "Validation Budget",
+            value: "¥25M–¥30M",
+            helper: "120-Day Pilot Phase"
         },
         {
-            label: "Monthly Burn",
-            value: "NZ$330K",
-            helper: "Pre-revenue, largely R&D",
+            label: "Sales Cycle",
+            value: "6–12 Months",
+            helper: "B2B Enterprise Sales"
         },
         {
-            label: "Regulatory Path",
-            value: "FDA 510(k)",
-            helper: "Class II, submit Q3'25",
-        },
+            label: "Target Margin",
+            value: "20%+",
+            helper: "Operating Margin (Year 3)"
+        }
     ],
     executiveSummary: {
-        short: "While technically feasible, Avasa Medical represents a strategic dead-end for Mayfield. The niche market size ($120M TAM), unverified unit economics, and hardware scaling risks do not align with our venture-scale return requirements. Despite our ability to fund it, the opportunity cost is too high.",
-        long: "The core investment thesis fails on strategic alignment. While the technology addresses a clinical need, the market is too small to support a venture-scale outcome. The team lacks commercial DNA, and the financial model relies on 'nonsense' gross margin assumptions (98%). This is a classic 'trap' investment: a working product in a market that doesn't matter.",
+        strategicGoal: "This decision review evaluates whether Kajima should proceed with pilot deployment and phased commercialization of its well-being building technologies.",
+        recommendation: {
+            title: "Phased Go — Pilot-First Commercialization",
+            detail: "Kajima should proceed with a Phased Go — pilot-first commercialization — prioritizing Premium Corporate Offices as the entry segment. This measured approach balances significant market opportunity against unproven commercial viability and technical integration challenges."
+        },
+        short: "The initiative addresses a high-growth market ($438B) with a strategic 'Bio-Adaptive' solution. However, execution is high-risk due to a lack of digital capability and commercial validation. Recommendation is a Phased Go to validate willingness-to-pay and regulatory compliance before scaling.",
+        long: "This initiative proposes transitioning Kajima from a general contractor to a performance-based provider by integrating proprietary architectural design with biometric sensing to guarantee occupant health outcomes. Given the high execution risks and lack of commercial validation, the recommendation is a Phased Go to test willingness-to-pay and regulatory compliance before full-scale investment. The immediate priority is a 120-day 'hostile validation' phase to secure a binding Letter of Intent.",
         highlights: [
             {
-                title: "Unserved Clinical Need",
-                detail: "Targeting a genuine 'blue ocean' arterial coupling market where the incumbent failed.",
+                title: "Strategic Opportunity",
+                detail: "Leverages 'Japan-first' footprint to capture post-pandemic 'flight to quality' and escape commodity margins."
             },
             {
-                title: "Technical Moat",
-                detail: "Novel mechanical design with pending patents requiring high-precision manufacturing.",
+                title: "Market Tailwinds",
+                detail: "Global wellness real estate market growing at 15.8%, driven by corporate demand for productivity."
             },
             {
-                title: "Strategic Synergy",
-                detail: "Potential to de-risk manufacturing scale-up using corporate partner's automation expertise.",
+                title: "Unique Solution",
+                detail: "'Bio-Adaptive' closed-loop system measures and adjusts environments in real-time, addressing the 'performance gap'."
+            }
+        ],
+        keyOpportunities: [
+            {
+                title: "Premium Market Position",
+                detail: "First-mover advantage in Japan's $1.5B-$3.0B wellness real estate segment with verifiable outcomes."
             },
+            {
+                title: "Recurring Revenue Model",
+                detail: "Shift from one-time construction to SaaS-like monitoring contracts with 20%+ margins."
+            },
+            {
+                title: "Corporate Wellness Tailwind",
+                detail: "Post-pandemic 'flight to quality' and ESG mandates driving demand for healthy buildings."
+            }
         ],
         watchouts: [
-            "Niche Market Reality: Realistic TAM is US$120M, overstated by 250x by founder.",
-            "Critical Team Gap: Complete absence of commercial, sales, and regulatory leadership.",
-            "Flawed Financials: Business model predicated on unviable 98% gross margin.",
+            "Regulatory Showstopper: Japan's APPI privacy laws regarding biometric data may block deployment.",
+            "Split-Incentive: Developers pay CapEx, tenants reap OpEx benefits; value attribution is difficult.",
+            "Talent Gap: Critical lack of Chief Medical Officer and Head of Product to validate claims and manage software."
         ],
         matrix: {
-            canWeDoIt: "High (Strong Capability)",
-            shouldWeDoIt: "Low (No Strategic Fit)",
-            canWeDoItText: "Mayfield has the capital and network to scale this, but it requires heavy operational lifting outside our core software/AI DNA.",
-            shouldWeDoItText: "Niche market, unproven economics, and hardware risk make this a 'nonsense' bet for a venture fund seeking power-law returns.",
+            canWeDoIt: "No (High confidence)",
+            shouldWeDoIt: "Borderline (Medium confidence)",
+            canWeDoItText: "Kajima excels at physical execution (Architecture) but lacks the digital DNA and scientific authority to build/sell a biometric SaaS platform.",
+            shouldWeDoItText: "Market size ($438B) and trend alignment are compelling, but product-market fit for a high-CapEx, proprietary hardware solution is unproven."
         }
     },
+    capabilityGaps: [
+        {
+            role: "Chief Medical Officer (CMO)",
+            severity: "urgent",
+            reason: "Required to validate health claims and provide scientific credibility for biometric wellness platform."
+        },
+        {
+            role: "Head of Product",
+            severity: "urgent",
+            reason: "Critical for software/SaaS product management — currently no digital product DNA in organization."
+        },
+        {
+            role: "Privacy/Compliance Lead",
+            severity: "important",
+            reason: "APPI biometric data compliance requires specialized expertise not present in current team."
+        },
+        {
+            role: "Data Science Team",
+            severity: "important",
+            reason: "Bio-algorithmic layer (TRL 4-5) needs dedicated ML/data engineering capability."
+        }
+    ],
     riskAnalysis: {
-        overall: "High-risk, high-potential project. Technical solution to a validated need is undermined by flawed market assessment, unproven commercial team, and precarious deal structure.",
+        overall: "High-Risk, High-Complexity venture. Potential reward is outweighed by structural barriers (privacy, split-incentive) and capability gaps. Requires strict validation gates.",
         topRisks: [
             {
-                title: "Misrepresented TAM & Unviable Economics",
-                detail: "Founder's $30B TAM claim is overstated by 250x; 98% gross margin assumption is unrealistic.",
+                title: "Regulatory Viability (APPI)",
+                detail: "Collection of biometric/physiological data faces strict privacy hurdles in corporate environments."
             },
             {
-                title: "Critical Commercial Execution Gap",
-                detail: "Founding team has world-class clinical expertise but zero commercial/sales leadership.",
+                title: "Zero Commercial Validation",
+                detail: "No paying customers or signed pilots to validate willingness-to-pay for the hardware premium."
             },
             {
-                title: "Funding Shortfall & Governance Opacity",
-                detail: "NZ$4.75M raise is insufficient to reach FDA clearance; lack of term sheet details.",
-            },
+                title: "Capability & Culture Mismatch",
+                detail: "Organization lacks 'Digital Product' DNA; missing critical Medical/Product leadership."
+            }
         ],
         sixTs: [
             {
                 title: "Team",
-                severity: "medium",
-                rating: "Mixed",
-                summary: "Strong technical founder, critical commercial gap. Key-person dependency on two co-inventors.",
+                severity: "high",
+                rating: "High Risk",
+                summary: "Strong engineering but critical gaps in medical science and digital product leadership."
             },
             {
                 title: "TAM",
-                severity: "high",
-                rating: "Niche",
-                summary: "Niche opportunity ($120M realistic TAM) with flawed market sizing by founder.",
+                severity: "medium",
+                rating: "Constrained",
+                summary: "Large global market ($438B) but 'premium' segment constrained by split-incentive economics."
             },
             {
                 title: "Technology",
-                severity: "medium",
-                rating: "Unproven",
-                summary: "Plausible innovation; key risks: performance in diseased arteries and IP defensibility.",
+                severity: "high",
+                rating: "Obsolescence",
+                summary: "Embedded proprietary sensors (3-5 yr life) in 50-yr buildings creates 'Zombie Tech' liability."
             },
             {
                 title: "Traction",
                 severity: "high",
                 rating: "Zero",
-                summary: "Zero commercial traction. Validation is purely qualitative (surgeon interest).",
+                summary: "Advanced prototypes (K/Park) exist, but zero external commercial customers or revenue."
             },
             {
                 title: "Trends",
                 severity: "medium",
                 rating: "Mixed",
-                summary: "Aligned with surgical efficiency trends but hampered by standard of care inertia.",
+                summary: "Wellness demand is high, but Privacy/Surveillance pushback is a major headwind."
             },
             {
                 title: "Terms",
                 severity: "high",
-                rating: "High Risk",
-                summary: "Unrealistic economics, insufficient funding runway, and material inconsistencies in financials.",
-            },
-        ],
+                rating: "Misaligned",
+                summary: "Construction governance stifles agile innovation; J-curve economics clash with low margins."
+            }
+        ]
     },
     chapters: [
         {
-            id: "opportunity-validation",
-            title: "Opportunity Validation",
-            summary: "Avasa targets the unserved arterial coupling segment. Manual suturing takes ~40 mins with 5.6% failure. Avasa promises 80% faster procedure time. Strong qualitative demand (89% surgeon interest), but adoption hurdle is high.",
+            id: "market-opportunity",
+            title: "Chapter 1: Market Opportunity",
+            summary: "Global wellness real estate market is $438B (15.8% CAGR). Kajima targets the $1.5B-$3.0B Japan premium office segment, driven by a post-pandemic 'flight to quality' and productivity demands.",
             keyMetrics: [
-                {
-                    label: "Procedure Time",
-                    value: "-80%",
-                    description: "Reduction vs. 40-min manual suturing.",
-                },
-                {
-                    label: "Surgeon Interest",
-                    value: "89%",
-                    description: "Of 100 surveyed surgeons want arterial coupler.",
-                },
-                {
-                    label: "Animal Success",
-                    value: "100%",
-                    description: "Patency in chronic animal studies (n=17).",
-                },
-            ],
-            tables: [
-                {
-                    title: "Validation Signals",
-                    headers: ["Signal", "Source", "Assessment"],
-                    rows: [
-                        ["Surgeon Demand", "Company Survey", "Strong but qualitative."],
-                        ["Pre-clinical Data", "Animal Studies", "Strong technical feasibility."],
-                        ["Market Gap", "Incumbent Failure", "Clear 'blue ocean' opportunity."],
-                    ],
-                },
+                { label: "Global TAM", value: "$438B", description: "15.8% CAGR (2023-2028)" },
+                { label: "Japan SOM", value: "$1.5B+", description: "Premium Office Construction" },
+                { label: "Rent Premium", value: "4.4-7.7%", description: "Verified market benchmark" }
             ],
             contentBlocks: [
                 {
-                    title: "Core Problem",
-                    body: "Manual suturing of micro-arteries is slow, risky, and technically demanding. Existing venous couplers cannot handle arterial pressure/stiffness.",
+                    title: "Flight to Quality",
+                    body: "Tenants demand environments that mitigate stress/burnout. Healthy buildings command rent premiums and longer lease terms."
                 },
                 {
-                    title: "Validation Gaps",
-                    body: "No commercial commitments. Success depends on overcoming surgeon inertia and proving efficacy in diseased human arteries.",
-                },
-            ],
-            callouts: [
-                {
-                    tone: "info",
-                    text: "Opportunity is valid but fragile; hinges on converting clinical interest into sales.",
-                },
-            ],
+                    title: "Split-Incentive Friction",
+                    body: "Developers bear capital costs while tenants gain productivity. Value capture requires overcoming this structural barrier."
+                }
+            ]
         },
         {
-            id: "product-and-technology",
-            title: "Product & Technology",
-            summary: "Three-part system: disposable coupler, handset, reusable applicator. Core innovation is 'zero-strain' attachment. Validated in animals, but manufacturing scale-up to 20-micron tolerance is a major risk.",
+            id: "competitor-landscape",
+            title: "Chapter 2: Competitor Landscape",
+            summary: "Kajima faces a 'Two-Front War': playing catch-up against Tech Giants (Honeywell) owning data, and defending against Domestic GCs (Obayashi/Shimizu) with similar 'smart' narratives.",
             keyMetrics: [
-                {
-                    label: "Tolerance",
-                    value: "20 µm",
-                    description: "Required manufacturing precision.",
-                },
-                {
-                    label: "Regulatory",
-                    value: "Class II",
-                    description: "FDA 510(k) pathway confirmed.",
-                },
-                {
-                    label: "Patency",
-                    value: "100%",
-                    description: "In chronic ovine studies.",
-                },
+                { label: "Primary Threat", value: "Commoditization", description: "WELL Cert + Sensors = Good Enough" },
+                { label: "Tech Rival", value: "Honeywell", description: "Owns the sensor/data layer" },
+                { label: "Standard", value: "Delos/WELL", description: "74,000+ locations certified" }
             ],
             contentBlocks: [
                 {
-                    title: "Technical Status",
-                    body: "Design frozen, pre-production units tested. Pending FDA submission Q3 2025.",
+                    title: "The Commoditization Trap",
+                    body: "Competitors can replicate 'wellness' marketing using standard sensors and certifications, undercutting Kajima's high-R&D approach."
                 },
                 {
-                    title: "Key Risks",
-                    body: "Performance in calcified human arteries unproven. Manufacturing scalability at required precision is a significant hurdle.",
-                },
-            ],
-            callouts: [
-                {
-                    tone: "danger",
-                    text: "Funding gap: Projected burn exceeds raise, risking insolvency before FDA clearance.",
-                },
-            ],
+                    title: "Differentiation Fragility",
+                    body: "Kajima's only moat is the proprietary logic linking design to physiology. Hardware is a liability, not a differentiator."
+                }
+            ]
         },
         {
-            id: "market-research",
-            title: "Market Research",
-            summary: "Realistic TAM is ~$120M (device-specific), contrasting with founder's $30B claim. Beachhead in plastic surgery is ~$54M. Market growth is steady (~7% CAGR).",
+            id: "product-technology",
+            title: "Chapter 3: Product & Technology",
+            summary: "An integrated 'Bio-Adaptive' platform (ST1-ST6) using proprietary 'WellnessGPT' and sensors. Physical tech is mature (TRL 9), but bio-algorithmic layer (TRL 4-5) lacks causal validation.",
             keyMetrics: [
-                { label: "Realistic TAM", value: "US$120M", description: "Device-specific market size." },
-                { label: "Founder Claim", value: "US$30B", description: "Based on total procedure value (inflated)." },
-                { label: "CAGR", value: "6.9%", description: "Projected market growth." },
+                { label: "Physical TRL", value: "9", description: "Construction capability is mature" },
+                { label: "Bio-Algo TRL", value: "4-5", description: "Lab validation only; unproven in wild" },
+                { label: "Core Risk", value: "Causality", description: "Link between design & stress relief unproven" }
             ],
-            charts: [
+            roadmap: [
                 {
-                    id: "market-chart",
-                    type: "bar",
-                    title: "Market Size Reality Check",
-                    labels: ["Founder Claim (TAM)", "Realistic TAM", "Beachhead SAM"],
-                    datasets: [
-                        {
-                            label: "Market Size (US$M)",
-                            data: [30000, 120, 54],
-                            backgroundColor: ["#ef4444", "#3b82f6", "#60a5fa"],
-                        },
-                    ],
-                    options: {
-                        indexAxis: 'y',
-                        scales: {
-                            x: {
-                                ticks: {
-                                    callback: (value) => `$${value}M`,
-                                },
-                            },
-                        },
-                    },
+                    stage: 1,
+                    title: "Sensor Integration",
+                    timeframe: "Q1-Q2",
+                    actions: "Partner with OEM sensors, reduce proprietary hardware dependency",
+                    active: true
                 },
+                {
+                    stage: 2,
+                    title: "Algorithm Validation",
+                    timeframe: "Q2-Q3",
+                    actions: "Clinical validation of bio-adaptive algorithms with medical oversight",
+                    active: false
+                },
+                {
+                    stage: 3,
+                    title: "Platform MVP",
+                    timeframe: "Q3-Q4",
+                    actions: "WellnessGPT integration, dashboard for real-time monitoring",
+                    active: false
+                }
             ],
             contentBlocks: [
                 {
-                    title: "Market Dynamics",
-                    body: "Niche but attractive. Growth driven by shift to microsurgery and efficiency. Unserved arterial segment is the key opportunity.",
+                    title: "Bio-Adaptive Loop",
+                    body: "Input (Environment) -> Response (Physiology) -> Outcome (Wellness). Requires real-time biometric feedback."
                 },
-            ],
-            callouts: [
                 {
-                    tone: "info",
-                    text: "Valuation must be anchored to the $120M realistic TAM, not the founder's $30B figure.",
-                },
-            ],
-        },
-        {
-            id: "competitive-analysis",
-            title: "Competitive Analysis",
-            summary: "Primary competitor is manual suturing (status quo). Incumbent Synovis dominates veins but failed in arteries. Lydus Medical (FDA cleared) is a key emerging threat.",
-            keyMetrics: [
-                { label: "Primary Rival", value: "Manual Suturing", description: "Entrenched standard of care." },
-                { label: "Incumbent", value: "Synovis", description: "Venous market leader; failed in arteries." },
-                { label: "Emerging Threat", value: "Lydus Medical", description: "FDA cleared suture aid." },
-            ],
-            tables: [
-                {
-                    title: "Competitive Landscape",
-                    headers: ["Competitor", "Strength", "Weakness"],
-                    rows: [
-                        ["Manual Suturing", "Standard of care, cheap.", "Slow (40m), high failure rate (5.6%)."],
-                        ["Synovis (Baxter)", "Market leader, distribution.", "Technology failed for arteries."],
-                        ["Lydus Medical", "FDA cleared, first mover.", "Suture aid, not a true coupler."],
-                    ],
-                },
-            ],
-            contentBlocks: [
-                {
-                    title: "Differentiation",
-                    body: "Avasa's 'zero-strain' mechanism allows arterial coupling. Reversibility is a key safety feature missing in competitors.",
-                },
-            ],
-            callouts: [
-                {
-                    tone: "danger",
-                    text: "Lydus Medical has a head start with FDA clearance. Avasa must prove clinical superiority.",
-                },
-            ],
+                    title: "Zombie Tech Risk",
+                    body: "Embedded sensors become obsolete in 3-5 years. Strategy must shift to 'Technology Curator' (partnering) vs manufacturing."
+                }
+            ]
         },
         {
             id: "go-to-market",
-            title: "Go To Market",
-            summary: "Surgeon-led strategy. Phase 1: Soft launch at 3 KOL sites (MD Anderson, etc.). Phase 2: Scale via distributors. Critical dependency on KOLs to navigate hospital procurement.",
+            title: "Chapter 4: Go-To-Market (GTM)",
+            summary: "Strategy utilizes a 'Trojan Horse' retrofit model (Soto-beya®) to enter clients before new construction. Depends on 'Technology Curator' partnership model with IWBI and sensor OEMs.",
             keyMetrics: [
-                { label: "Launch Strategy", value: "KOL-led", description: "Soft launch at 3 major centers." },
-                { label: "Sales Model", value: "Hybrid", description: "Direct to key accounts, distributors for scale." },
-                { label: "Distributor Fee", value: "35%", description: "Assumed margin share." },
+                { label: "Validation", value: "120 Days", description: "Hostile pilot phase timeframe" },
+                { label: "Target", value: "Corp HQ", description: "Tier 1 Japanese Corporates" },
+                { label: "Strategy", value: "Retrofit First", description: "Bypass 3-5yr construction cycle" }
             ],
-            tables: [
+            roadmap: [
                 {
-                    title: "Launch Phases",
-                    headers: ["Phase", "Focus", "Timeline"],
-                    rows: [
-                        ["Soft Launch", "3 KOL Sites, Clinical Data", "Q3 2026"],
-                        ["Hard Launch", "US & NZ Expansion", "2028"],
-                        ["Global Scale", "EU, Asia, Australia", "2029+"],
-                    ],
+                    stage: 1,
+                    title: "Hostile Validation",
+                    timeframe: "Days 1-120",
+                    actions: "Secure binding LOI, validate APPI compliance, recruit CMO",
+                    active: true
                 },
+                {
+                    stage: 2,
+                    title: "Pilot Deployment",
+                    timeframe: "Months 4-9",
+                    actions: "Deploy Soto-beya units, collect biometric data, measure outcomes",
+                    active: false
+                },
+                {
+                    stage: 3,
+                    title: "Commercial Launch",
+                    timeframe: "Year 1-2",
+                    actions: "Scale to 5+ enterprise clients, establish recurring revenue model",
+                    active: false
+                },
+                {
+                    stage: 4,
+                    title: "Platform Expansion",
+                    timeframe: "Year 2-3",
+                    actions: "Integrate full architectural solutions, expand beyond Japan",
+                    active: false
+                }
             ],
             contentBlocks: [
                 {
-                    title: "Execution Risks",
-                    body: "Heavy reliance on KOLs. No commercial team in place. Sales ramp projections are aggressive and unvalidated.",
+                    title: "Trojan Horse Entry",
+                    body: "Deploy modular units (Soto-beya) to generate verified data and build trust before upselling full architectural integration."
                 },
-            ],
-            callouts: [
                 {
-                    tone: "danger",
-                    text: "Need to hire US-based commercial leader immediately to de-risk launch.",
-                },
-            ],
+                    title: "Partnership Model",
+                    body: "Must secure 'Keystone' partnership with IWBI (WELL) for credibility and sensor OEMs for hardware reliability."
+                }
+            ]
         },
         {
-            id: "revenue-model",
-            title: "Revenue Model",
-            summary: "Razor-and-blade model: Reusable applicator ($3K) + Single-use coupler ($3K). Premium pricing strategy. Viability depends on unproven 98% gross margin and premium price acceptance.",
+            id: "financial-operational",
+            title: "Chapter 5: Financial & Operational Health",
+            summary: "Financial model requires a 15-25% market premium to offset high fixed R&D costs. Economics show a 'J-curve' profile with heavy upfront burn and unproven recurring revenue tails.",
             keyMetrics: [
-                { label: "Coupler Price", value: "US$3,000", description: "Target ASP per consumable." },
-                { label: "Applicator Price", value: "US$3,000", description: "One-time hardware sale." },
-                { label: "Gross Margin", value: "97-98%", description: "Projected (Highly Optimistic)." },
+                { label: "Target Premium", value: "15-25%", description: "Required for model viability" },
+                { label: "Burn Rate", value: "High", description: "Driven by R&D headcount" },
+                { label: "Revenue Mix", value: "Hybrid", description: "CapEx Premium + SaaS OpEx" }
             ],
+            financialData: {
+                unitEconomics: [
+                    { label: "Tech Talent Cost", value: "¥12M-¥25M/yr", note: "Per senior hire" },
+                    { label: "Construction Margin", value: "3-5%", note: "Industry average" },
+                    { label: "Target Margin (Y3)", value: "20%+", note: "With SaaS component" },
+                    { label: "Customer LTV", value: "TBD", note: "Pending validation" }
+                ],
+                revenueModel: [
+                    { label: "CapEx Premium", value: "15-25%", note: "Construction upcharge" },
+                    { label: "SaaS Monitoring", value: "¥X/sqm/mo", note: "Recurring revenue" },
+                    { label: "Data Licensing", value: "TBD", note: "Future revenue stream" }
+                ],
+                keyAssumptions: [
+                    "Willingness-to-pay for premium unverified",
+                    "SaaS adoption rate in J-market unknown",
+                    "Split-incentive resolution required"
+                ]
+            },
             contentBlocks: [
                 {
-                    title: "Pricing Logic",
-                    body: "Priced to fit within existing DRG reimbursement bundles. Justified by OR time savings ($1k/patient saved).",
+                    title: "Unit Economics",
+                    body: "High-cost tech talent (¥12M-¥25M) inside low-margin construction model creates margin pressure. Needs recurring revenue to survive."
                 },
                 {
-                    title: "Model Weakness",
-                    body: "Margins are outliers vs industry (65%). COGS assumptions are conflicting and unverified.",
-                },
-            ],
-            callouts: [
-                {
-                    tone: "info",
-                    text: "Verify COGS and price acceptance with independent procurement officers.",
-                },
-            ],
+                    title: "Split-Incentive Risk",
+                    body: "Developer pays CapEx, Tenant gets OpEx benefit. Willingness-to-pay remains the single biggest unverified assumption."
+                }
+            ]
         },
         {
-            id: "unit-economics",
-            title: "Unit Economics",
-            summary: "Projected economics are theoretical and aggressive. 97-98% GM is an outlier. No CAC data exists. Model sensitive to price and sales volume.",
+            id: "org-regulatory",
+            title: "Chapter 6: Org & Regulatory Readiness",
+            summary: "Significant capability gap in Digital/Scientific leadership. Regulatory risk is high due to APPI privacy laws regarding biometric data collection in workplaces.",
             keyMetrics: [
-                { label: "Gross Margin", value: "97-98%", description: "Vs. MedTech median ~65%." },
-                { label: "COGS (Coupler)", value: "NZ$73", description: "Conflicting data (Deck says $46)." },
-                { label: "Breakeven", value: "2030", description: "Projected EBITDA positive." },
-            ],
-            charts: [
-                {
-                    id: "margin-comp-chart",
-                    type: "bar",
-                    title: "Gross Margin Comparison",
-                    labels: ["Avasa (Projected)", "Medtronic", "Industry Median"],
-                    datasets: [
-                        {
-                            label: "Gross Margin %",
-                            data: [98, 65, 65.1],
-                            backgroundColor: ["#f59e0b", "#3b82f6", "#94a3b8"],
-                        },
-                    ],
-                    options: {
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 100,
-                            },
-                        },
-                    },
-                },
+                { label: "Talent Gap", value: "Critical", description: "Missing CMO & Head of Product" },
+                { label: "Privacy Risk", value: "High", description: "APPI Biometric compliance" },
+                { label: "Structure", value: "Matrixed", description: "R&D Streams vs Venture Team" }
             ],
             contentBlocks: [
                 {
-                    title: "Data Integrity",
-                    body: "COGS discrepancy ($73 vs $46) undermines confidence. No historical CAC data.",
-                },
-            ],
-            callouts: [
-                {
-                    tone: "danger",
-                    text: "Rebuild model with 65-75% GM to test viability.",
-                },
-            ],
-        },
-        {
-            id: "finance-and-operations",
-            title: "Finance & Operations",
-            summary: "Seeking NZ$4.75M Series A. Run-rate analysis suggests funding gap before FDA clearance. Revenue projections ($10M in Y1 sales) are unrealistic given lack of sales capacity.",
-            keyMetrics: [
-                { label: "Raise Ask", value: "NZ$4.75M", description: "Series A." },
-                { label: "Burn Rate", value: "NZ$330k/mo", description: "Projected average." },
-                { label: "Runway", value: "19.5 mo", description: "Short of 24-mo FDA timeline." },
-            ],
-            charts: [
-                {
-                    id: "burn-runway-chart",
-                    type: "line",
-                    title: "Capital vs. Milestones",
-                    labels: ["Close", "6 Mo", "12 Mo", "18 Mo", "FDA Clearance (24 Mo)"],
-                    datasets: [
-                        {
-                            label: "Projected Cash Balance",
-                            data: [6.45, 4.5, 2.5, 0.5, -1.5], // Illustrative drop
-                            borderColor: "#ef4444",
-                            fill: false,
-                        },
-                    ],
-                },
-            ],
-            contentBlocks: [
-                {
-                    title: "Funding Gap",
-                    body: "Projected burn ($7.9M) exceeds raise + tax credits ($6.45M). Likely need for bridge round.",
+                    title: "Capability Mismatch",
+                    body: "World-class construction engineering but weak 'Digital Product' DNA. Need to hire external specialized talent."
                 },
                 {
-                    title: "Sales Ramp",
-                    body: "Revenue forecast assumes unrealistic sales rep productivity ($5M/rep).",
-                },
-            ],
-            callouts: [
-                {
-                    tone: "danger",
-                    text: "Deal must be restructured to fully fund through FDA clearance (NZ$8M+).",
-                },
-            ],
-        },
-        {
-            id: "team-and-execution",
-            title: "Team & Execution",
-            summary: "Strong technical/clinical founder (Dr. Abeysekera). Critical gap in commercial/sales leadership. Success hinges on founder's ability to transition to CEO and hire experienced execs.",
-            keyMetrics: [
-                { label: "Founder", value: "Strong", description: "Clinical + Bioengineering background." },
-                { label: "Commercial", value: "Weak", description: "No in-house sales/marketing leadership." },
-                { label: "Advisors", value: "Strong", description: "Top-tier KOL network." },
-            ],
-            contentBlocks: [
-                {
-                    title: "Key Person Risk",
-                    body: "High dependency on founder. Need to hire COO/CSO.",
-                },
-                {
-                    title: "Execution Capability",
-                    body: "Good R&D execution so far. Commercial execution is completely unproven.",
-                },
-            ],
-            callouts: [
-                {
-                    tone: "info",
-                    text: "Invest contingent on hiring US-based commercial leader.",
-                },
-            ],
-        },
-        {
-            id: "legal-and-ip",
-            title: "Legal & IP",
-            summary: "Patents pending in key markets. Manufacturing trade secrets (20-micron tolerance). Competitor patent (Flow Doppler) poses risk to future pipeline. Regulatory path: FDA 510(k) Class II.",
-            keyMetrics: [
-                { label: "IP Status", value: "Pending", description: "USA, EU, China, Japan, Korea." },
-                { label: "FTO", value: "Unverified", description: "Company claim only." },
-                { label: "FDA Path", value: "510(k)", description: "Class II, Q2 2026 Clearance." },
-            ],
-            contentBlocks: [
-                {
-                    title: "IP Landscape",
-                    body: "Core device IP filed. Competitor holds patent relevant to future 'Flow Doppler' product.",
-                },
-                {
-                    title: "Data Privacy",
-                    body: "Gap in plan for handling patient data (HIPAA/GDPR) for clinical trials.",
-                },
-            ],
-            callouts: [
-                {
-                    tone: "info",
-                    text: "Commission independent FTO analysis before closing.",
-                },
-            ],
-        },
-    ],
+                    title: "Regulatory Showstopper",
+                    body: "Collecting stress/emotion data via cameras/sensors risks violating APPI. 'Consent' in workplace is legally complex."
+                }
+            ]
+        }
+    ]
 };
 
 window.memoData = memoData;
