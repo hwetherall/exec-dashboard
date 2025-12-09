@@ -181,7 +181,17 @@ Based on this evidence, what is your investment recommendation? Remember to resp
                 throw new Error('No response content received');
             }
 
-            const recommendation = parseResponse(content);
+            const parsedRec = parseResponse(content);
+
+            // Map to UI format expected by Tracker
+            const recommendation = {
+                score: parsedRec.verdict.replace(/_/g, ' '),
+                label: `${parsedRec.confidence} CONFIDENCE`,
+                title: "Investment Recommendation",
+                logic: parsedRec.reasoning,
+                // Keep original data
+                ...parsedRec
+            };
             
             // Add hypothesis snapshot
             recommendation.hypothesisSnapshot = hypotheses.map(h => ({

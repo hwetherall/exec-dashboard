@@ -10,6 +10,52 @@ const memoData = {
         raiseAmount: "¥25M–¥30M (Validation Budget)",
         valuationNote: "Internal Corporate Venture"
     },
+    depthMode: {
+        theAsk: "¥30M / 120 Days",
+        thePrize: "$438B TAM",
+        theBlocker: "APPI Privacy Risk",
+        gutCheck: "Look, the strategy team loves the buzzwords—'Bio-Adaptive,' 'WellnessGPT'—but operationally, this is a minefield. We build static assets, not privacy-invasive data platforms. Let them sell one pilot to a stranger in the next four months; if they can't get a signed check without us subsidizing it, we kill the tech layer.",
+        goConditions: [
+            "APPI legal opinion confirms deployability in corporate settings",
+            "1+ signed LOI from non-Kajima client at hardware premium price",
+            "Pilot data shows >15% improvement in occupant satisfaction"
+        ],
+        validationPlan: [
+            { 
+                phase: "1", 
+                title: "Packaging", 
+                days: "Days 1-30", 
+                tasks: ["Define 'Wellbeing SKU' (Soto-beya + sensors)", "Create ROI-focused sales deck (productivity, not specs)"], 
+                output: "Sales Deck & Pricing Model" 
+            },
+            { 
+                phase: "2", 
+                title: "Sales Testing", 
+                days: "Days 31-90", 
+                tasks: ["Pitch to 15 existing corporate clients", "Test specific pricing tiers (CapEx vs OpEx)"], 
+                output: "3+ LOIs at 10%+ premium" 
+            },
+            { 
+                phase: "3", 
+                title: "Compliance", 
+                days: "Days 31-60 (parallel)", 
+                tasks: ["Third-party APPI audit of sensor suite", "Draft data usage agreements"], 
+                output: "Clean legal opinion" 
+            },
+            { 
+                phase: "4", 
+                title: "Decision Gate", 
+                days: "Day 120", 
+                tasks: ["🟢 GO if: 3+ LOIs + Clean legal + Pilot data", "🟡 PIVOT if: Interest but no premium", "🔴 KILL if: Zero LOIs or regulatory block"], 
+                output: "Final Recommendation" 
+            }
+        ],
+        discussionQuestions: [
+            "Are we willing to create a separate comp band to hire data scientists who earn more than our senior engineers?",
+            "If APPI blocks biometric sensing, does the remaining 'low-tech' wellness market justify this R&D investment?",
+            "Why haven't we sold a pilot yet? Is it price, product, or channel?"
+        ]
+    },
     summaryStats: [
         {
             label: "Global TAM",
@@ -355,11 +401,37 @@ const memoData = {
                     datasets: [
                         {
                             label: "Cumulative Cash Flow",
-                            data: [-450, -850, -1000, -500, 100], 
+                            data: [-450, -850, -1000, -400, 300], 
                             borderColor: "#f59e0b",
-                            fill: false,
+                            backgroundColor: "rgba(245, 158, 11, 0.1)",
+                            fill: true,
+                            tension: 0.4,
                         }
-                    ]
+                    ],
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                ticks: {
+                                    callback: function(value) {
+                                        return value.toLocaleString();
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             ],
             contentBlocks: [

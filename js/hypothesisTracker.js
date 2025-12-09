@@ -20,7 +20,9 @@ const HypothesisTracker = (function() {
             type: 'all',
             owner: 'all'
         },
-        expandedCards: new Set()
+        expandedCards: new Set(),
+        isLoading: false,
+        error: null
     };
 
     // Icons for the UI
@@ -142,9 +144,9 @@ const HypothesisTracker = (function() {
 
         container.innerHTML = `
             <section class="chapter-header">
-                <p class="eyebrow">Due Diligence</p>
-                <h2 class="chapter-title">Hypothesis Tracker</h2>
-                <p class="chapter-summary">Track and validate key investment hypotheses. Kill criteria must be validated before proceeding. The recommendation updates dynamically based on your assessments.</p>
+                <p class="eyebrow">${I18n.t('tracker.due_diligence')}</p>
+                <h2 class="chapter-title">${I18n.t('tracker.title')}</h2>
+                <p class="chapter-summary">${I18n.t('tracker.summary')}</p>
             </section>
 
             ${renderRecommendationPanel()}
@@ -156,16 +158,16 @@ const HypothesisTracker = (function() {
                         <div class="section-header-content">
                             <h3 class="section-title">
                                 <span class="section-icon kill">${icons.warning}</span>
-                                Kill Criteria
+                                ${I18n.t('tracker.kill_criteria')}
                             </h3>
-                            <p class="section-description">These hypotheses must be validated. If any is invalidated, the recommendation will be NO-GO.</p>
+                            <p class="section-description">${I18n.t('tracker.kill_desc')}</p>
                         </div>
                         <span class="section-count">${killCriteria.length} hypotheses</span>
                     </div>
                     <div class="hypothesis-cards" id="killCriteriaCards">
                         ${killCriteria.length > 0 
                             ? killCriteria.map(h => renderHypothesisCard(h)).join('') 
-                            : '<p class="no-results">No hypotheses match the current filters.</p>'}
+                            : '<div class="empty-state">No hypotheses found.</div>'}
                     </div>
                 </section>
 
@@ -173,307 +175,245 @@ const HypothesisTracker = (function() {
                     <div class="section-header">
                         <div class="section-header-content">
                             <h3 class="section-title">
-                                <span class="section-icon weighted">${icons.arrowRight}</span>
-                                Weighted Hypotheses
+                                <span class="section-icon weight">${icons.target}</span>
+                                ${I18n.t('tracker.weighted')}
                             </h3>
-                            <p class="section-description">These contribute to the overall assessment but are not individually deal-breaking.</p>
+                            <p class="section-description">${I18n.t('tracker.weighted_desc')}</p>
                         </div>
                         <span class="section-count">${weighted.length} hypotheses</span>
                     </div>
                     <div class="hypothesis-cards" id="weightedCards">
                         ${weighted.length > 0 
                             ? weighted.map(h => renderHypothesisCard(h)).join('') 
-                            : '<p class="no-results">No hypotheses match the current filters.</p>'}
+                            : '<div class="empty-state">No hypotheses found.</div>'}
                     </div>
                 </section>
             </div>
         `;
 
-        // Setup event listeners
-        setupEventListeners();
+        setupGlobalEventListeners();
     }
 
     /**
-     * Render the recommendation panel
+     * Get current state
+     */
+    function getState() {
+        return state;
+    }
+
+    /**
+     * Show loading state
+     */
+    function showLoading() {
+        state.isLoading = true;
+        state.error = null;
+        rerenderRecommendationPanel();
+    }
+
+    /**
+     * Hide loading state
+     */
+    function hideLoading() {
+        state.isLoading = false;
+        rerenderRecommendationPanel();
+    }
+
+    /**
+     * Show error message
+     */
+    function showError(message) {
+        state.isLoading = false;
+        state.error = message;
+        rerenderRecommendationPanel();
+    }
+
+    /**
+     * Update recommendation display
+     */
+    function updateRecommendationDisplay(recommendation) {
+        saveRecommendation(recommendation);
+        state.isLoading = false;
+        state.error = null;
+        rerenderRecommendationPanel();
+    }
+
+    /**
+     * Re-render just the recommendation panel
+     */
+    function rerenderRecommendationPanel() {
+        const container = document.querySelector('.tracker-rec-panel');
+        if (container) {
+            container.outerHTML = renderRecommendationPanel();
+            // Re-attach listener
+            const refreshBtn = document.getElementById('refreshRecBtn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', () => {
+                    HypothesisScorer.triggerAutoRefresh();
+                });
+            }
+        } else {
+            // Fallback if panel doesn't exist (e.g. first load)
+            render(); 
+        }
+    }
+
+    /**
+     * Render recommendation panel
      */
     function renderRecommendationPanel() {
-        const rec = state.recommendation;
-        const allHypotheses = state.hypotheses;
-        const killCriteria = allHypotheses.filter(h => h.type === HypothesisType.KILL_CRITERIA);
-        const assessed = getAssessedCount(allHypotheses);
-        const killCounts = countByOutcome(killCriteria);
+        if (state.isLoading) {
+            return `
+                <div class="tracker-rec-panel">
+                    <div class="rec-content" style="width: 100%; text-align: center; padding: 2rem;">
+                        <div class="chat-loading-dot" style="display: inline-block; margin: 0 2px;"></div>
+                        <div class="chat-loading-dot" style="display: inline-block; margin: 0 2px;"></div>
+                        <div class="chat-loading-dot" style="display: inline-block; margin: 0 2px;"></div>
+                        <p style="margin-top: 1rem; color: var(--text-secondary);">Generating AI Recommendation...</p>
+                    </div>
+                </div>
+            `;
+        }
 
-        const hasRecommendation = rec && rec.verdict;
-        const verdictClass = hasRecommendation ? rec.verdict.toLowerCase().replace(/_/g, '-') : 'pending';
-        
-        const verdictLabels = {
-            'GO': 'GO',
-            'NO_GO': 'NO GO',
-            'CONTINUE_DD': 'CONTINUE DUE DILIGENCE',
-            'PROCEED_WITH_CAUTION': 'PROCEED WITH CAUTION'
+        if (state.error) {
+            return `
+                <div class="tracker-rec-panel" style="border-color: var(--danger-color); background: #fef2f2;">
+                    <div class="rec-content">
+                        <h3 style="color: var(--danger-color);">Error</h3>
+                        <p>${state.error}</p>
+                        <button class="btn-secondary btn-sm" onclick="HypothesisScorer.triggerAutoRefresh()" style="margin-top: 1rem;">
+                            Retry
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // If no recommendation from LLM, show default or loading
+        const rec = state.recommendation || {
+            score: '...',
+            label: I18n.t('common.loading'),
+            title: 'AI Assessment Pending',
+            logic: 'Interact with hypotheses to generate an updated recommendation.'
         };
 
-        const verdictIcons = {
-            'GO': icons.check,
-            'NO_GO': icons.x,
-            'CONTINUE_DD': icons.arrowRight,
-            'PROCEED_WITH_CAUTION': icons.warning
-        };
-
-        const timeAgo = rec?.updatedAt ? getTimeAgo(new Date(rec.updatedAt)) : 'Never';
+        // Ensure fields exist to avoid "undefined"
+        const score = rec.score || rec.verdict?.replace(/_/g, ' ') || '...';
+        const label = rec.label || (rec.confidence ? `${rec.confidence} CONFIDENCE` : '') || '';
+        const title = rec.title || 'Recommendation';
+        const logic = rec.logic || rec.reasoning || '';
 
         return `
-            <div class="recommendation-panel ${verdictClass}" id="recommendationPanel">
-                <div class="recommendation-header">
-                    <div class="recommendation-title">
-                        <h3>Investment Recommendation</h3>
-                        <p class="recommendation-subtitle">AI-powered analysis based on hypothesis outcomes</p>
-                    </div>
-                    <button class="refresh-btn" id="refreshRecommendation" title="Refresh recommendation">
-                        ${icons.refresh}
-                        <span>Refresh</span>
-                    </button>
+            <div class="tracker-rec-panel">
+                <div class="rec-score-box">
+                    <div class="rec-score">${score}</div>
+                    <div class="rec-label-small">${label}</div>
                 </div>
-
-                <div class="recommendation-content">
-                    <div class="verdict-section">
-                        <div class="verdict-badge ${verdictClass}">
-                            <span class="verdict-icon">${hasRecommendation ? verdictIcons[rec.verdict] || '' : '?'}</span>
-                            <span class="verdict-text">${hasRecommendation ? verdictLabels[rec.verdict] || rec.verdict : 'Not Yet Analyzed'}</span>
-                        </div>
-                        ${rec?.confidence ? `<span class="confidence-badge ${rec.confidence.toLowerCase()}">${rec.confidence} Confidence</span>` : ''}
+                <div class="rec-content">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h3>${title}</h3>
+                        <button class="btn-secondary btn-sm" id="refreshRecBtn" title="Force Refresh">
+                            ${icons.refresh}
+                        </button>
                     </div>
-
-                    ${hasRecommendation ? `
-                        <div class="reasoning-section">
-                            <p class="reasoning-text">${rec.reasoning || ''}</p>
-                        </div>
-
-                        ${rec.priorities?.length ? `
-                            <div class="priorities-section">
-                                <h4>Priority Actions</h4>
-                                <ul class="priorities-list">
-                                    ${rec.priorities.map(p => `<li>${p}</li>`).join('')}
-                                </ul>
-                            </div>
-                        ` : ''}
-
-                        ${rec.concerns?.length ? `
-                            <div class="concerns-section">
-                                <h4>Key Concerns</h4>
-                                <ul class="concerns-list">
-                                    ${rec.concerns.map(c => `<li>${c}</li>`).join('')}
-                                </ul>
-                            </div>
-                        ` : ''}
-                    ` : `
-                        <div class="reasoning-section empty">
-                            <p class="reasoning-text">Click "Refresh" to generate an AI-powered investment recommendation based on your hypothesis assessments.</p>
-                        </div>
-                    `}
-                </div>
-
-                <div class="recommendation-footer">
-                    <div class="coverage-stats">
-                        <div class="stat">
-                            <span class="stat-label">Coverage</span>
-                            <span class="stat-value">${assessed}/${allHypotheses.length} assessed</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-label">Kill Criteria</span>
-                            <span class="stat-value">
-                                <span class="kill-stat validated">${killCounts.validated} ✓</span>
-                                <span class="kill-stat invalidated">${killCounts.invalidated} ✗</span>
-                                <span class="kill-stat pending">${killCounts.pending} pending</span>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="last-updated">
-                        Last updated: ${timeAgo}
-                    </div>
-                </div>
-
-                <div class="recommendation-loading" id="recommendationLoading" style="display: none;">
-                    <div class="loading-spinner"></div>
-                    <p>Analyzing hypotheses...</p>
+                    <p class="rec-logic">${logic}</p>
                 </div>
             </div>
         `;
     }
 
     /**
-     * Render the filter bar
+     * Render filter bar
      */
     function renderFilterBar() {
-        const categories = Object.entries(CategoryConfig);
-        const statuses = Object.entries(StatusConfig);
-        const owners = getUniqueOwners(state.hypotheses);
-
-        // Count hypotheses per filter option
-        const categoryCounts = {};
-        const statusCounts = {};
-        const typeCounts = { kill_criteria: 0, weighted: 0 };
-        const ownerCounts = {};
-
-        state.hypotheses.forEach(h => {
-            categoryCounts[h.category] = (categoryCounts[h.category] || 0) + 1;
-            statusCounts[h.status] = (statusCounts[h.status] || 0) + 1;
-            typeCounts[h.type] = (typeCounts[h.type] || 0) + 1;
-            const owner = h.owner || h.suggestedOwner;
-            if (owner) ownerCounts[owner] = (ownerCounts[owner] || 0) + 1;
-        });
-
         return `
-            <div class="filter-bar" id="filterBar">
-                <div class="filter-icon">${icons.filter}</div>
+            <div class="filter-bar">
+                <span class="filter-icon">${icons.filter}</span>
+                <span class="filter-label">${I18n.t('tracker.filters')}:</span>
                 
-                <div class="filter-group">
-                    <label for="filterCategory">Category</label>
-                    <select id="filterCategory" class="filter-select">
-                        <option value="all">All Categories (${state.hypotheses.length})</option>
-                        ${categories.map(([key, config]) => 
-                            `<option value="${key}" ${state.filters.category === key ? 'selected' : ''}>
-                                ${config.label} (${categoryCounts[key] || 0})
-                            </option>`
-                        ).join('')}
-                    </select>
-                </div>
+                <select class="filter-select" id="filterCategory">
+                    <option value="all">${I18n.t('tracker.filter_category')}: ${I18n.t('tracker.all')}</option>
+                    ${Object.values(HypothesisCategory).map(c => `<option value="${c}" ${state.filters.category === c ? 'selected' : ''}>${c}</option>`).join('')}
+                </select>
 
-                <div class="filter-group">
-                    <label for="filterStatus">Status</label>
-                    <select id="filterStatus" class="filter-select">
-                        <option value="all">All Statuses (${state.hypotheses.length})</option>
-                        ${statuses.map(([key, config]) => 
-                            `<option value="${key}" ${state.filters.status === key ? 'selected' : ''}>
-                                ${config.label} (${statusCounts[key] || 0})
-                            </option>`
-                        ).join('')}
-                    </select>
-                </div>
+                <select class="filter-select" id="filterStatus">
+                    <option value="all">${I18n.t('tracker.filter_status')}: ${I18n.t('tracker.all')}</option>
+                    ${Object.entries(StatusConfig).map(([k, v]) => `<option value="${k}" ${state.filters.status === k ? 'selected' : ''}>${I18n.t('status.' + k.toLowerCase()) || v.label}</option>`).join('')}
+                </select>
 
-                <div class="filter-group">
-                    <label for="filterType">Type</label>
-                    <select id="filterType" class="filter-select">
-                        <option value="all">All Types (${state.hypotheses.length})</option>
-                        <option value="kill_criteria" ${state.filters.type === 'kill_criteria' ? 'selected' : ''}>
-                            Kill Criteria (${typeCounts.kill_criteria})
-                        </option>
-                        <option value="weighted" ${state.filters.type === 'weighted' ? 'selected' : ''}>
-                            Weighted (${typeCounts.weighted})
-                        </option>
-                    </select>
+                <div style="margin-left: auto; display: flex; gap: 0.5rem;">
+                    <button class="btn-secondary" onclick="alert('Export feature pending')">${I18n.t('tracker.btn_export')}</button>
+                    <button class="btn-primary" onclick="alert('Add feature pending')">+ ${I18n.t('tracker.btn_add')}</button>
                 </div>
-
-                <div class="filter-group">
-                    <label for="filterOwner">Owner</label>
-                    <select id="filterOwner" class="filter-select">
-                        <option value="all">All Owners (${state.hypotheses.length})</option>
-                        ${owners.map(owner => 
-                            `<option value="${owner}" ${state.filters.owner === owner ? 'selected' : ''}>
-                                ${owner} (${ownerCounts[owner] || 0})
-                            </option>`
-                        ).join('')}
-                    </select>
-                </div>
-
-                <button class="filter-reset" id="resetFilters" ${Object.values(state.filters).every(v => v === 'all') ? 'disabled' : ''}>
-                    Reset
-                </button>
             </div>
         `;
     }
 
     /**
-     * Render a hypothesis card
+     * Render a single hypothesis card
      */
-    function renderHypothesisCard(hypothesis) {
-        const h = hypothesis;
+    function renderHypothesisCard(h) {
         const isExpanded = state.expandedCards.has(h.id);
-        const categoryConfig = CategoryConfig[h.category];
         const statusConfig = StatusConfig[h.status];
         const outcomeConfig = OutcomeConfig[h.outcome];
-        const displayOwner = h.owner || h.suggestedOwner || 'Unassigned';
-        const displayDate = h.dueDate ? formatDate(h.dueDate) : (h.suggestedDueDays ? `+${h.suggestedDueDays} days` : 'No date');
+        const owner = h.owner || h.suggestedOwner;
+        
+        // Use i18n for labels
+        const statusLabel = I18n.t('status.' + h.status.toLowerCase()) || statusConfig.label;
+        const outcomeLabel = I18n.t('outcome.' + h.outcome.toLowerCase()) || outcomeConfig.label;
 
         return `
-            <div class="hypothesis-card ${isExpanded ? 'expanded' : ''} ${h.type}" data-id="${h.id}" id="card-${h.id}">
-                <div class="card-header" data-toggle="${h.id}">
-                    <div class="card-header-left">
-                        <span class="category-tag" style="background-color: ${categoryConfig.color}20; color: ${categoryConfig.color}; border-color: ${categoryConfig.color}40;">
-                            ${categoryConfig.label}
+            <div class="h-card ${isExpanded ? 'expanded' : ''}" id="card-${h.id}">
+                <div class="card-summary" onclick="HypothesisTracker.toggleCard('${h.id}')">
+                    <span class="h-id">${h.id}</span>
+                    <div class="h-content">
+                        <h4>${h.title}</h4>
+                        <div class="h-meta">
+                            <span>${h.category}</span>
+                            <span>•</span>
+                            <span>${owner}</span>
+                        </div>
+                    </div>
+                    <div class="h-status">
+                        <span class="status-pill" style="background: ${statusConfig.color}20; color: ${statusConfig.color}">
+                            ${statusLabel}
                         </span>
-                        <h4 class="card-title">${h.title}</h4>
                     </div>
-                    <div class="card-header-right">
-                        <span class="expand-icon">${isExpanded ? icons.chevronUp : icons.chevronDown}</span>
+                    <div class="h-outcome">
+                        <div class="outcome-pill" 
+                             style="background: ${outcomeConfig.color};" 
+                             title="${outcomeLabel}">
+                            ${outcomeConfig.icon}
+                        </div>
+                    </div>
+                    <div class="expand-icon">
+                        ${isExpanded ? icons.chevronUp : icons.chevronDown}
                     </div>
                 </div>
-
-                <div class="card-meta">
-                    <span class="meta-item owner">
-                        <span class="meta-label">Owner:</span> ${displayOwner}
-                    </span>
-                    <span class="meta-divider">|</span>
-                    <span class="meta-item due">
-                        <span class="meta-label">Due:</span> ${displayDate}
-                    </span>
-                    <span class="meta-divider">|</span>
-                    <span class="meta-item status">
-                        <span class="status-dot" style="background-color: ${statusConfig.color};"></span>
-                        ${statusConfig.label}
-                    </span>
-                </div>
-
-                <div class="outcome-buttons" data-hypothesis="${h.id}">
-                    ${renderOutcomeButtons(h)}
-                </div>
-
                 ${isExpanded ? renderExpandedContent(h) : ''}
             </div>
         `;
     }
 
     /**
-     * Render outcome buttons
-     */
-    function renderOutcomeButtons(h) {
-        const outcomes = [
-            { key: HypothesisOutcome.PENDING, label: 'Pending', icon: '○' },
-            { key: HypothesisOutcome.VALIDATED, label: 'Validated', icon: '✓' },
-            { key: HypothesisOutcome.INVALIDATED, label: 'Invalidated', icon: '✗' },
-            { key: HypothesisOutcome.PARTIALLY_VALIDATED, label: 'Partial', icon: '◐' },
-            { key: HypothesisOutcome.INCONCLUSIVE, label: '?', icon: '?' }
-        ];
-
-        return outcomes.map(o => `
-            <button class="outcome-btn ${o.key} ${h.outcome === o.key ? 'active' : ''}" 
-                    data-outcome="${o.key}" 
-                    data-hypothesis="${h.id}"
-                    title="${o.label}">
-                <span class="outcome-icon">${o.icon}</span>
-                <span class="outcome-label">${o.label}</span>
-            </button>
-        `).join('');
-    }
-
-    /**
      * Render expanded card content
      */
     function renderExpandedContent(h) {
-        const statusOptions = Object.entries(StatusConfig).map(([key, config]) => 
-            `<label class="radio-option ${h.status === key ? 'active' : ''}">
+        const statusOptions = Object.entries(StatusConfig).map(([key, config]) => {
+            const label = I18n.t('status.' + key.toLowerCase()) || config.label;
+            return `<label class="radio-option ${h.status === key ? 'active' : ''}">
                 <input type="radio" name="status-${h.id}" value="${key}" ${h.status === key ? 'checked' : ''}>
-                <span class="radio-label">${config.label}</span>
-            </label>`
-        ).join('');
+                <span class="radio-label">${label}</span>
+            </label>`;
+        }).join('');
 
-        const outcomeOptions = Object.entries(OutcomeConfig).map(([key, config]) => 
-            `<label class="radio-option outcome-radio ${key} ${h.outcome === key ? 'active' : ''}">
+        const outcomeOptions = Object.entries(OutcomeConfig).map(([key, config]) => {
+            const label = I18n.t('outcome.' + key.toLowerCase()) || config.label;
+            return `<label class="radio-option outcome-radio ${key} ${h.outcome === key ? 'active' : ''}">
                 <input type="radio" name="outcome-${h.id}" value="${key}" ${h.outcome === key ? 'checked' : ''}>
                 <span class="radio-icon">${config.icon}</span>
-                <span class="radio-label">${config.label}</span>
-            </label>`
-        ).join('');
+                <span class="radio-label">${label}</span>
+            </label>`;
+        }).join('');
 
         return `
             <div class="card-expanded">
@@ -482,19 +422,19 @@ const HypothesisTracker = (function() {
                 </div>
 
                 <div class="expanded-section assignment">
-                    <h5>Assignment</h5>
+                    <h5>${I18n.t('tracker.assignment')}</h5>
                     <div class="assignment-fields">
                         <div class="field-group">
-                            <label for="owner-${h.id}">Owner</label>
+                            <label for="owner-${h.id}">${I18n.t('tracker.owner')}</label>
                             <input type="text" 
                                    id="owner-${h.id}" 
                                    class="field-input owner-input" 
                                    value="${h.owner || ''}" 
-                                   placeholder="${h.suggestedOwner || 'Assign owner...'}"
+                                   placeholder="${h.suggestedOwner || I18n.t('tracker.placeholder_owner')}"
                                    data-hypothesis="${h.id}">
                         </div>
                         <div class="field-group">
-                            <label for="due-${h.id}">Due Date</label>
+                            <label for="due-${h.id}">${I18n.t('tracker.due_date')}</label>
                             <input type="date" 
                                    id="due-${h.id}" 
                                    class="field-input date-input" 
@@ -505,41 +445,41 @@ const HypothesisTracker = (function() {
                 </div>
 
                 <div class="expanded-section status-section">
-                    <h5>Status</h5>
+                    <h5>${I18n.t('tracker.status')}</h5>
                     <div class="radio-group status-radios" data-hypothesis="${h.id}">
                         ${statusOptions}
                     </div>
                 </div>
 
                 <div class="expanded-section outcome-section">
-                    <h5>Outcome</h5>
+                    <h5>${I18n.t('tracker.outcome')}</h5>
                     <div class="radio-group outcome-radios" data-hypothesis="${h.id}">
                         ${outcomeOptions}
                     </div>
                 </div>
 
                 <div class="expanded-section notes-section">
-                    <h5>Notes</h5>
+                    <h5>${I18n.t('tracker.notes')}</h5>
                     <textarea class="notes-textarea" 
                               id="notes-${h.id}" 
-                              placeholder="Add evidence, findings, links..."
+                              placeholder="${I18n.t('tracker.placeholder_notes')}"
                               data-hypothesis="${h.id}">${h.notes || ''}</textarea>
                 </div>
 
                 <div class="expanded-section validation-section">
                     <div class="validation-info">
-                        <span class="validation-label">Validation Method:</span>
-                        <p class="validation-text">${h.validationMethod || 'Not specified'}</p>
+                        <span class="validation-label">${I18n.t('tracker.validation')}:</span>
+                        <p class="validation-text">${h.validationMethod || I18n.t('tracker.not_specified')}</p>
                     </div>
                     <div class="source-info">
-                        <span class="source-label">Source:</span>
-                        <span class="source-text">${h.sourceSection || 'Not specified'}</span>
+                        <span class="source-label">${I18n.t('tracker.source')}:</span>
+                        <span class="source-text">${h.sourceSection || I18n.t('tracker.not_specified')}</span>
                     </div>
                 </div>
 
                 ${h.updatedAt ? `
                     <div class="card-footer">
-                        <span class="updated-at">Last updated: ${getTimeAgo(new Date(h.updatedAt))}</span>
+                        <span class="updated-at">${I18n.t('tracker.last_updated')}: ${getTimeAgo(new Date(h.updatedAt))}</span>
                     </div>
                 ` : ''}
             </div>
@@ -569,220 +509,94 @@ const HypothesisTracker = (function() {
     /**
      * Setup event listeners
      */
-    function setupEventListeners() {
-        // Refresh recommendation button
-        const refreshBtn = document.getElementById('refreshRecommendation');
+    function setupGlobalEventListeners() {
+        const filters = ['filterCategory', 'filterStatus'];
+        filters.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('change', (e) => {
+                    const key = id.replace('filter', '').toLowerCase();
+                    state.filters[key] = e.target.value;
+                    render(); // Full re-render on filter change
+                });
+            }
+        });
+
+        const refreshBtn = document.getElementById('refreshRecBtn');
         if (refreshBtn) {
             refreshBtn.addEventListener('click', () => {
-                HypothesisScorer.generateRecommendation(state.hypotheses);
+                HypothesisScorer.triggerAutoRefresh();
             });
         }
 
-        // Filter changes
-        const filterCategory = document.getElementById('filterCategory');
-        const filterStatus = document.getElementById('filterStatus');
-        const filterType = document.getElementById('filterType');
-        const filterOwner = document.getElementById('filterOwner');
-        const resetFilters = document.getElementById('resetFilters');
-
-        if (filterCategory) {
-            filterCategory.addEventListener('change', (e) => {
-                state.filters.category = e.target.value;
-                render();
-            });
-        }
-
-        if (filterStatus) {
-            filterStatus.addEventListener('change', (e) => {
-                state.filters.status = e.target.value;
-                render();
-            });
-        }
-
-        if (filterType) {
-            filterType.addEventListener('change', (e) => {
-                state.filters.type = e.target.value;
-                render();
-            });
-        }
-
-        if (filterOwner) {
-            filterOwner.addEventListener('change', (e) => {
-                state.filters.owner = e.target.value;
-                render();
-            });
-        }
-
-        if (resetFilters) {
-            resetFilters.addEventListener('click', () => {
-                state.filters = { category: 'all', status: 'all', type: 'all', owner: 'all' };
-                render();
-            });
-        }
-
-        // Setup card event listeners
-        document.querySelectorAll('.hypothesis-card').forEach(card => {
+        // Setup listeners for existing expanded cards
+        document.querySelectorAll('.h-card.expanded').forEach(card => {
             setupCardEventListeners(card);
         });
     }
 
     /**
-     * Setup event listeners for a specific card
+     * Setup listeners for a specific card
      */
-    function setupCardEventListeners(card) {
-        const id = card.dataset.id;
-
-        // Card toggle (expand/collapse)
-        const header = card.querySelector('.card-header');
-        if (header) {
-            header.addEventListener('click', () => {
-                if (state.expandedCards.has(id)) {
-                    state.expandedCards.delete(id);
-                } else {
-                    state.expandedCards.add(id);
-                }
-                rerenderCard(id);
-            });
-        }
-
-        // Outcome buttons (quick access)
-        card.querySelectorAll('.outcome-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const outcome = btn.dataset.outcome;
-                const hypothesisId = btn.dataset.hypothesis;
-                updateHypothesis(hypothesisId, { outcome });
-            });
-        });
-
-        // Owner input
-        const ownerInput = card.querySelector('.owner-input');
-        if (ownerInput) {
-            ownerInput.addEventListener('change', (e) => {
-                updateHypothesis(e.target.dataset.hypothesis, { owner: e.target.value });
-            });
-        }
-
-        // Date input
-        const dateInput = card.querySelector('.date-input');
-        if (dateInput) {
-            dateInput.addEventListener('change', (e) => {
-                updateHypothesis(e.target.dataset.hypothesis, { dueDate: e.target.value || null });
-            });
-        }
-
-        // Status radios
-        card.querySelectorAll('.status-radios input[type="radio"]').forEach(radio => {
+    function setupCardEventListeners(cardElement) {
+        // Status Radios
+        cardElement.querySelectorAll('.status-radios input').forEach(radio => {
             radio.addEventListener('change', (e) => {
-                const hypothesisId = e.target.closest('.radio-group').dataset.hypothesis;
-                updateHypothesis(hypothesisId, { status: e.target.value });
+                const id = e.target.name.split('-')[1];
+                updateHypothesis(id, { status: e.target.value });
             });
         });
 
-        // Outcome radios (in expanded view)
-        card.querySelectorAll('.outcome-radios input[type="radio"]').forEach(radio => {
+        // Outcome Radios
+        cardElement.querySelectorAll('.outcome-radios input').forEach(radio => {
             radio.addEventListener('change', (e) => {
-                const hypothesisId = e.target.closest('.radio-group').dataset.hypothesis;
-                updateHypothesis(hypothesisId, { outcome: e.target.value });
+                const id = e.target.name.split('-')[1];
+                updateHypothesis(id, { outcome: e.target.value });
             });
         });
 
-        // Notes textarea
-        const notesTextarea = card.querySelector('.notes-textarea');
-        if (notesTextarea) {
-            // Debounce notes saving
-            let notesTimeout;
-            notesTextarea.addEventListener('input', (e) => {
-                clearTimeout(notesTimeout);
-                notesTimeout = setTimeout(() => {
-                    updateHypothesis(e.target.dataset.hypothesis, { notes: e.target.value });
-                }, 500);
+        // Inputs
+        cardElement.querySelectorAll('input[type="text"], input[type="date"], textarea').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const id = e.target.dataset.hypothesis;
+                const field = e.target.id.split('-')[0]; // owner, due, notes
+                let fieldName = field;
+                if (field === 'due') fieldName = 'dueDate';
+                
+                updateHypothesis(id, { [fieldName]: e.target.value });
             });
+        });
+    }
+
+    /**
+     * Toggle card expansion
+     */
+    function toggleCard(id) {
+        if (state.expandedCards.has(id)) {
+            state.expandedCards.delete(id);
+        } else {
+            state.expandedCards.add(id);
         }
+        rerenderCard(id);
     }
 
     /**
-     * Show loading state on recommendation panel
+     * Get time ago string
      */
-    function showLoading() {
-        const loading = document.getElementById('recommendationLoading');
-        const refreshBtn = document.getElementById('refreshRecommendation');
-        if (loading) loading.style.display = 'flex';
-        if (refreshBtn) refreshBtn.disabled = true;
-    }
-
-    /**
-     * Hide loading state on recommendation panel
-     */
-    function hideLoading() {
-        const loading = document.getElementById('recommendationLoading');
-        const refreshBtn = document.getElementById('refreshRecommendation');
-        if (loading) loading.style.display = 'none';
-        if (refreshBtn) refreshBtn.disabled = false;
-    }
-
-    /**
-     * Update recommendation display
-     */
-    function updateRecommendationDisplay(recommendation) {
-        saveRecommendation(recommendation);
-        
-        // Re-render just the recommendation panel
-        const panel = document.getElementById('recommendationPanel');
-        if (panel) {
-            const newPanel = document.createElement('div');
-            newPanel.innerHTML = renderRecommendationPanel();
-            panel.replaceWith(newPanel.firstElementChild);
-            
-            // Re-attach refresh button listener
-            const refreshBtn = document.getElementById('refreshRecommendation');
-            if (refreshBtn) {
-                refreshBtn.addEventListener('click', () => {
-                    HypothesisScorer.generateRecommendation(state.hypotheses);
-                });
-            }
-        }
-    }
-
-    /**
-     * Show error in recommendation panel
-     */
-    function showError(message) {
-        const panel = document.getElementById('recommendationPanel');
-        if (panel) {
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'recommendation-error';
-            errorDiv.innerHTML = `<p>${message}</p>`;
-            
-            const content = panel.querySelector('.recommendation-content');
-            if (content) {
-                const existing = content.querySelector('.recommendation-error');
-                if (existing) existing.remove();
-                content.insertBefore(errorDiv, content.firstChild);
-            }
-        }
-        hideLoading();
-    }
-
-    // Utility functions
-    function formatDate(dateString) {
-        if (!dateString) return '';
-        const date = new Date(dateString);
-        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    }
-
     function getTimeAgo(date) {
-        const now = new Date();
-        const diff = now - date;
-        const minutes = Math.floor(diff / 60000);
-        const hours = Math.floor(diff / 3600000);
-        const days = Math.floor(diff / 86400000);
+        const seconds = Math.floor((new Date() - date) / 1000);
+        let interval = seconds / 31536000;
 
-        if (minutes < 1) return 'Just now';
-        if (minutes < 60) return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-        if (hours < 24) return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-        if (days < 7) return `${days} day${days > 1 ? 's' : ''} ago`;
-        return formatDate(date.toISOString());
+        if (interval > 1) return Math.floor(interval) + " years ago";
+        interval = seconds / 2592000;
+        if (interval > 1) return Math.floor(interval) + " months ago";
+        interval = seconds / 86400;
+        if (interval > 1) return Math.floor(interval) + " days ago";
+        interval = seconds / 3600;
+        if (interval > 1) return Math.floor(interval) + " hours ago";
+        interval = seconds / 60;
+        if (interval > 1) return Math.floor(interval) + " minutes ago";
+        return "just now";
     }
 
     // Public API
@@ -791,19 +605,13 @@ const HypothesisTracker = (function() {
         render,
         updateHypothesis,
         saveRecommendation,
-        updateRecommendationDisplay,
+        getHypotheses: () => state.hypotheses,
+        toggleCard,
+        // Scorer API
+        getState,
         showLoading,
         hideLoading,
         showError,
-        getState: () => state
+        updateRecommendationDisplay
     };
 })();
-
-// Initialize on load
-document.addEventListener('DOMContentLoaded', () => {
-    HypothesisTracker.init();
-});
-
-// Expose to window
-window.HypothesisTracker = HypothesisTracker;
-

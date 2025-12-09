@@ -277,6 +277,18 @@ function renderSensitivityPanel(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
+    // Remove existing panel if it exists
+    const existingPanel = document.getElementById('sensitivityPanel');
+    if (existingPanel) {
+        existingPanel.remove();
+    }
+
+    // Destroy existing chart if it exists
+    if (sensitivityChart) {
+        sensitivityChart.destroy();
+        sensitivityChart = null;
+    }
+
     // Calculate base metrics for delta comparison
     baseMetrics = calculateProjections(baseAssumptions).metrics;
 

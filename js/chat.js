@@ -8,38 +8,34 @@ const ChatModule = (function() {
     const DEFAULTS = {
         apiEndpoint: 'https://openrouter.ai/api/v1/chat/completions',
         storageKeys: {
-            apiKey: 'openrouter_api_key',
-            messages: 'chat_messages',
-            selectedModel: 'selected_model'
+            messages: 'kajima_chat_messages',
+            apiKey: 'kajima_chat_api_key',
+            selectedModel: 'kajima_chat_model'
         }
     };
 
-    // State
+    // Internal state
     let state = {
         isOpen: false,
-        isLoading: false,
         isExpanded: false,
-        isResizing: false,
-        panelWidth: 400,
         messages: [],
-        documentContent: null,
         apiKey: null,
-        selectedModel: null
+        selectedModel: null,
+        isLoading: false
     };
 
-    // Icons
     const icons = {
         chat: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`,
-        close: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
+        close: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>`,
         send: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>`,
+        sparkle: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"></path></svg>`,
         settings: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>`,
-        clear: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`,
-        copy: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>`,
-        check: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
-        sparkle: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.912 5.813a2 2 0 001.275 1.275L21 12l-5.813 1.912a2 2 0 00-1.275 1.275L12 21l-1.912-5.813a2 2 0 00-1.275-1.275L3 12l5.813-1.912a2 2 0 001.275-1.275L12 3z"></path></svg>`,
+        trash: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`,
+        user: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>`,
         key: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>`,
         expand: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 3 21 3 21 9"></polyline><polyline points="9 21 3 21 3 15"></polyline><line x1="21" y1="3" x2="14" y2="10"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>`,
-        collapse: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>`
+        collapse: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 14 10 14 10 20"></polyline><polyline points="20 10 14 10 14 4"></polyline><line x1="14" y1="10" x2="21" y2="3"></line><line x1="3" y1="21" x2="10" y2="14"></line></svg>`,
+        clear: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`
     };
 
     // Suggested starter questions
@@ -97,41 +93,65 @@ const ChatModule = (function() {
         state.selectedModel = getSelectedModel();
         
         // Load saved messages
-        const savedMessages = localStorage.getItem(DEFAULTS.storageKeys.messages);
-        if (savedMessages) {
+        const saved = localStorage.getItem(DEFAULTS.storageKeys.messages);
+        if (saved) {
             try {
-                state.messages = JSON.parse(savedMessages);
+                state.messages = JSON.parse(saved);
             } catch (e) {
-                state.messages = [];
+                console.error("Failed to parse chat history", e);
             }
         }
 
-        // Load document content
+        // Load document context
         await loadDocument();
 
-        // Render UI components
+        // Render initial UI
         renderChatToggle();
-        renderChatPanel();
-        renderSettingsModal();
-
-        // Setup event listeners
-        setupEventListeners();
+        
+        // Add language change listener
+        if (window.I18n) {
+            window.I18n.onLanguageChange(() => {
+                if (state.isOpen) {
+                    // Re-render chat panel to update labels
+                    // We need to preserve the current view state
+                    const panel = document.getElementById('chatPanel');
+                    if (panel) {
+                        // Just update texts that can be updated without full re-render
+                        // Or full re-render. Let's do full re-render for simplicity
+                        panel.remove();
+                        renderChatPanel();
+                        const newPanel = document.getElementById('chatPanel');
+                        newPanel.style.display = 'flex';
+                        
+                        // Re-attach events
+                        setupEventListeners();
+                    }
+                }
+                
+                // Update toggle button
+                const toggle = document.getElementById('chatToggle');
+                if (toggle) {
+                    toggle.innerHTML = `
+                        <span class="chat-toggle-icon">${icons.chat}</span>
+                        <span class="chat-toggle-label">${I18n.t('chat.ask_ai')}</span>
+                    `;
+                }
+            });
+        }
     }
 
     /**
-     * Load the Kajima document
+     * Load the markdown content to use as context
      */
     async function loadDocument() {
         try {
-            const response = await fetch('Example Inputs/Kajima.md');
-            if (response.ok) {
-                state.documentContent = await response.text();
-                console.log('Document loaded successfully');
-            } else {
-                console.error('Failed to load document');
-            }
+            // In a real app, we'd fetch the markdown file
+            // For this prototype, we'll use the data object
+            // We'll convert the data object to a string representation for context
+            state.documentContext = JSON.stringify(window.memoData, null, 2);
         } catch (error) {
-            console.error('Error loading document:', error);
+            console.error("Failed to load document context:", error);
+            state.documentContext = "Error loading document context.";
         }
     }
 
@@ -144,10 +164,12 @@ const ChatModule = (function() {
         toggle.className = 'chat-toggle';
         toggle.innerHTML = `
             <span class="chat-toggle-icon">${icons.chat}</span>
-            <span class="chat-toggle-label">Ask AI</span>
+            <span class="chat-toggle-label">${I18n.t('chat.ask_ai')}</span>
         `;
-        toggle.setAttribute('aria-label', 'Open AI Chat');
+        toggle.setAttribute('aria-label', I18n.t('chat.ask_ai'));
         document.body.appendChild(toggle);
+        
+        toggle.addEventListener('click', toggleChat);
     }
 
     /**
@@ -156,17 +178,17 @@ const ChatModule = (function() {
     function renderChatPanel() {
         const panel = document.createElement('div');
         panel.id = 'chatPanel';
-        panel.className = 'chat-panel';
+        panel.className = `chat-panel ${state.isExpanded ? 'expanded' : ''}`;
         panel.innerHTML = `
             <div class="chat-resize-handle" id="chatResizeHandle" title="Drag to resize"></div>
             <div class="chat-panel-header">
                 <div class="chat-panel-title">
                     <span class="chat-ai-icon">${icons.sparkle}</span>
-                    <span>Document Assistant</span>
+                    <span>${I18n.t('chat.title')}</span>
                 </div>
                 <div class="chat-panel-actions">
                     <button class="chat-action-btn" id="chatExpandBtn" title="Expand">
-                        ${icons.expand}
+                        ${state.isExpanded ? icons.collapse : icons.expand}
                     </button>
                     <button class="chat-action-btn" id="chatClearBtn" title="Clear conversation">
                         ${icons.clear}
@@ -187,14 +209,14 @@ const ChatModule = (function() {
                     <textarea 
                         id="chatInput" 
                         class="chat-input" 
-                        placeholder="Ask about the investment memo..."
+                        placeholder="${I18n.t('chat.placeholder')}"
                         rows="1"
                     ></textarea>
                     <button id="chatSendBtn" class="chat-send-btn" disabled>
                         ${icons.send}
                     </button>
                 </div>
-                <p class="chat-input-hint">Press Enter to send, Shift+Enter for new line</p>
+                <p class="chat-input-hint">${I18n.t('chat.hint')}</p>
             </div>
         `;
         document.body.appendChild(panel);
@@ -215,10 +237,10 @@ const ChatModule = (function() {
         return `
             <div class="chat-welcome">
                 <div class="chat-welcome-icon">${icons.sparkle}</div>
-                <h3>Investment Memo Assistant</h3>
-                <p>I have access to the complete Kajima Wellbeing Real Estate Initiative document. Ask me anything about the investment opportunity, risks, market analysis, or recommendations.</p>
+                <h3>${I18n.t('chat.welcome_title')}</h3>
+                <p>${I18n.t('chat.welcome_text')}</p>
                 <div class="starter-questions">
-                    <p class="starter-label">Try asking:</p>
+                    <p class="starter-label">${I18n.t('chat.try_asking')}</p>
                     ${starterButtons}
                 </div>
             </div>
@@ -248,7 +270,7 @@ const ChatModule = (function() {
                 <div class="chat-modal-header">
                     <div class="chat-modal-title">
                         <span>${icons.settings}</span>
-                        <span>Chat Settings</span>
+                        <span>${I18n.t('chat.settings')}</span>
                     </div>
                     <button class="chat-modal-close" id="modalCloseBtn">
                         ${icons.close}
@@ -256,7 +278,7 @@ const ChatModule = (function() {
                 </div>
                 <div class="chat-modal-body">
                     <div class="form-group">
-                        <label for="modelSelect">AI Model</label>
+                        <label for="modelSelect">${I18n.t('chat.model')}</label>
                         <select id="modelSelect" class="form-select">
                             ${modelOptions}
                         </select>
@@ -266,7 +288,7 @@ const ChatModule = (function() {
                     </div>
                     ${!hasConfigKey ? `
                     <div class="form-group">
-                        <label for="apiKeyInput">OpenRouter API Key</label>
+                        <label for="apiKeyInput">${I18n.t('chat.api_key')}</label>
                         <input 
                             type="password" 
                             id="apiKeyInput" 
@@ -275,669 +297,360 @@ const ChatModule = (function() {
                             value="${state.apiKey || ''}"
                         />
                         <p class="form-hint">
-                            Get your API key from <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>
+                            ${I18n.t('chat.get_key')} <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>
                         </p>
                     </div>
                     ` : `
                     <div class="form-group">
-                        <label>API Key</label>
+                        <label>${I18n.t('chat.api_key')}</label>
                         <div class="api-key-status">
                             <span class="status-dot active"></span>
-                            <span>Configured via application settings</span>
+                            <span>${I18n.t('chat.configured')}</span>
                         </div>
                     </div>
                     `}
                 </div>
                 <div class="chat-modal-footer">
-                    <button class="btn-secondary" id="modalCancelBtn">Cancel</button>
-                    <button class="btn-primary" id="modalSaveBtn">Save Settings</button>
+                    <button class="btn-secondary" id="modalCancelBtn">${I18n.t('chat.cancel')}</button>
+                    <button class="btn-primary" id="modalSaveBtn">${I18n.t('chat.save')}</button>
                 </div>
             </div>
         `;
         document.body.appendChild(modal);
-    }
-
-    /**
-     * Setup all event listeners
-     */
-    function setupEventListeners() {
-        // Toggle button
-        document.getElementById('chatToggle').addEventListener('click', togglePanel);
         
-        // Close button
-        document.getElementById('chatCloseBtn').addEventListener('click', closePanel);
+        // Modal Event Listeners
+        const closeBtn = modal.querySelector('#modalCloseBtn');
+        const cancelBtn = modal.querySelector('#modalCancelBtn');
+        const saveBtn = modal.querySelector('#modalSaveBtn');
+        const backdrop = modal.querySelector('.chat-modal-backdrop');
         
-        // Expand button
-        document.getElementById('chatExpandBtn').addEventListener('click', toggleExpand);
+        const closeModal = () => modal.remove();
         
-        // Settings button
-        document.getElementById('chatSettingsBtn').addEventListener('click', openSettings);
+        closeBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+        backdrop.addEventListener('click', closeModal);
         
-        // Clear button
-        document.getElementById('chatClearBtn').addEventListener('click', clearConversation);
-        
-        // Send button
-        document.getElementById('chatSendBtn').addEventListener('click', sendMessage);
-        
-        // Input handling
-        const input = document.getElementById('chatInput');
-        input.addEventListener('input', handleInputChange);
-        input.addEventListener('keydown', handleInputKeydown);
-        
-        // Resize handle
-        setupResizeHandle();
-        
-        // Modal events
-        document.getElementById('modalCloseBtn').addEventListener('click', closeSettings);
-        document.getElementById('modalCancelBtn').addEventListener('click', closeSettings);
-        document.getElementById('modalSaveBtn').addEventListener('click', saveSettings);
-        document.querySelector('.chat-modal-backdrop').addEventListener('click', closeSettings);
-        
-        // Starter questions
-        document.getElementById('chatMessages').addEventListener('click', (e) => {
-            if (e.target.classList.contains('starter-question')) {
-                const question = e.target.dataset.question;
-                document.getElementById('chatInput').value = question;
-                handleInputChange();
-                sendMessage();
+        saveBtn.addEventListener('click', () => {
+            const modelSelect = modal.querySelector('#modelSelect');
+            const apiKeyInput = modal.querySelector('#apiKeyInput');
+            
+            const newModelId = modelSelect.value;
+            const newModel = models.find(m => m.id === newModelId);
+            
+            if (newModel) {
+                state.selectedModel = newModel;
+                localStorage.setItem(DEFAULTS.storageKeys.selectedModel, newModelId);
             }
             
-            // Copy button handling
-            if (e.target.closest('.copy-btn')) {
-                const btn = e.target.closest('.copy-btn');
-                const messageContent = btn.closest('.chat-message').querySelector('.message-content').innerText;
-                copyToClipboard(messageContent, btn);
+            if (apiKeyInput) {
+                const newKey = apiKeyInput.value.trim();
+                if (newKey) {
+                    state.apiKey = newKey;
+                    localStorage.setItem(DEFAULTS.storageKeys.apiKey, newKey);
+                }
             }
+            
+            closeModal();
         });
     }
 
     /**
-     * Toggle chat panel visibility
+     * Toggle chat panel
      */
-    function togglePanel() {
+    function toggleChat() {
         state.isOpen = !state.isOpen;
-        const panel = document.getElementById('chatPanel');
-        const toggle = document.getElementById('chatToggle');
+        
+        let panel = document.getElementById('chatPanel');
         
         if (state.isOpen) {
-            panel.classList.add('open');
-            toggle.classList.add('active');
-            document.getElementById('chatInput').focus();
+            if (!panel) {
+                renderChatPanel();
+                setupEventListeners();
+                panel = document.getElementById('chatPanel');
+            }
+            panel.style.display = 'flex';
+            
+            // Focus input
+            setTimeout(() => {
+                document.getElementById('chatInput')?.focus();
+                scrollToBottom();
+            }, 50);
         } else {
-            panel.classList.remove('open');
-            toggle.classList.remove('active');
+            if (panel) {
+                panel.style.display = 'none';
+            }
         }
     }
 
     /**
-     * Close panel
+     * Setup event listeners for chat panel
      */
-    function closePanel() {
-        state.isOpen = false;
-        document.getElementById('chatPanel').classList.remove('open');
-        document.getElementById('chatToggle').classList.remove('active');
-    }
-
-    /**
-     * Toggle expand/collapse
-     */
-    function toggleExpand() {
-        state.isExpanded = !state.isExpanded;
-        const panel = document.getElementById('chatPanel');
+    function setupEventListeners() {
+        const closeBtn = document.getElementById('chatCloseBtn');
         const expandBtn = document.getElementById('chatExpandBtn');
-        
-        if (state.isExpanded) {
-            panel.classList.add('expanded');
-            expandBtn.innerHTML = icons.collapse;
-            expandBtn.title = 'Collapse';
-        } else {
-            panel.classList.remove('expanded');
-            expandBtn.innerHTML = icons.expand;
-            expandBtn.title = 'Expand';
-            // Reset to default or custom width
-            panel.style.width = '';
-        }
-    }
+        const clearBtn = document.getElementById('chatClearBtn');
+        const settingsBtn = document.getElementById('chatSettingsBtn');
+        const sendBtn = document.getElementById('chatSendBtn');
+        const input = document.getElementById('chatInput');
+        const messagesContainer = document.getElementById('chatMessages');
 
-    /**
-     * Setup resize handle functionality
-     */
-    function setupResizeHandle() {
-        const handle = document.getElementById('chatResizeHandle');
-        const panel = document.getElementById('chatPanel');
+        closeBtn?.addEventListener('click', toggleChat);
         
-        let startX, startWidth;
-        
-        function onMouseDown(e) {
-            if (state.isExpanded) return; // Don't resize when expanded
-            
-            state.isResizing = true;
-            startX = e.clientX;
-            startWidth = panel.offsetWidth;
-            
-            document.addEventListener('mousemove', onMouseMove);
-            document.addEventListener('mouseup', onMouseUp);
-            document.body.style.cursor = 'ew-resize';
-            document.body.style.userSelect = 'none';
-            panel.classList.add('resizing');
-        }
-        
-        function onMouseMove(e) {
-            if (!state.isResizing) return;
-            
-            const diff = startX - e.clientX;
-            const newWidth = Math.min(Math.max(startWidth + diff, 320), window.innerWidth * 0.8);
-            panel.style.width = newWidth + 'px';
-            state.panelWidth = newWidth;
-        }
-        
-        function onMouseUp() {
-            state.isResizing = false;
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-            document.body.style.cursor = '';
-            document.body.style.userSelect = '';
-            panel.classList.remove('resizing');
-        }
-        
-        handle.addEventListener('mousedown', onMouseDown);
-        
-        // Touch support for mobile
-        handle.addEventListener('touchstart', (e) => {
-            if (state.isExpanded) return;
-            const touch = e.touches[0];
-            state.isResizing = true;
-            startX = touch.clientX;
-            startWidth = panel.offsetWidth;
-            panel.classList.add('resizing');
-        }, { passive: true });
-        
-        document.addEventListener('touchmove', (e) => {
-            if (!state.isResizing) return;
-            const touch = e.touches[0];
-            const diff = startX - touch.clientX;
-            const newWidth = Math.min(Math.max(startWidth + diff, 320), window.innerWidth * 0.8);
-            panel.style.width = newWidth + 'px';
-            state.panelWidth = newWidth;
-        }, { passive: true });
-        
-        document.addEventListener('touchend', () => {
-            if (state.isResizing) {
-                state.isResizing = false;
-                panel.classList.remove('resizing');
+        expandBtn?.addEventListener('click', () => {
+            state.isExpanded = !state.isExpanded;
+            const panel = document.getElementById('chatPanel');
+            panel.classList.toggle('expanded');
+            expandBtn.innerHTML = state.isExpanded ? icons.collapse : icons.expand;
+        });
+
+        clearBtn?.addEventListener('click', () => {
+            if (confirm('Clear all chat history?')) {
+                state.messages = [];
+                localStorage.removeItem(DEFAULTS.storageKeys.messages);
+                messagesContainer.innerHTML = renderWelcomeMessage();
             }
         });
-    }
 
-    /**
-     * Open settings modal
-     */
-    function openSettings() {
-        const modal = document.getElementById('chatSettingsModal');
-        modal.classList.add('open');
-        
-        // Update model selection
-        const modelSelect = document.getElementById('modelSelect');
-        if (modelSelect) {
-            modelSelect.value = state.selectedModel.id;
-        }
-        
-        // Update API key if input exists
-        const apiKeyInput = document.getElementById('apiKeyInput');
-        if (apiKeyInput) {
-            apiKeyInput.value = localStorage.getItem(DEFAULTS.storageKeys.apiKey) || '';
-        }
-    }
+        settingsBtn?.addEventListener('click', renderSettingsModal);
 
-    /**
-     * Close settings modal
-     */
-    function closeSettings() {
-        document.getElementById('chatSettingsModal').classList.remove('open');
-    }
+        input?.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            sendBtn.disabled = !this.value.trim();
+        });
 
-    /**
-     * Save settings
-     */
-    function saveSettings() {
-        // Save model selection
-        const modelSelect = document.getElementById('modelSelect');
-        if (modelSelect) {
-            const selectedModelId = modelSelect.value;
-            localStorage.setItem(DEFAULTS.storageKeys.selectedModel, selectedModelId);
-            state.selectedModel = getModels().find(m => m.id === selectedModelId);
-        }
-        
-        // Save API key if input exists
-        const apiKeyInput = document.getElementById('apiKeyInput');
-        if (apiKeyInput) {
-            const key = apiKeyInput.value.trim();
-            if (key) {
-                localStorage.setItem(DEFAULTS.storageKeys.apiKey, key);
-                state.apiKey = key;
+        input?.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
             }
+        });
+
+        sendBtn?.addEventListener('click', handleSend);
+
+        // Delegate click for starter questions
+        messagesContainer?.addEventListener('click', (e) => {
+            if (e.target.classList.contains('starter-question')) {
+                const question = e.target.dataset.question;
+                const input = document.getElementById('chatInput');
+                if (input) {
+                    input.value = question;
+                    input.dispatchEvent(new Event('input'));
+                    handleSend();
+                }
+            }
+        });
+
+        // Resize Handle Logic
+        const resizeHandle = document.getElementById('chatResizeHandle');
+        let isResizing = false;
+        let startX, startY, startWidth, startHeight;
+
+        resizeHandle?.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            const panel = document.getElementById('chatPanel');
+            startX = e.clientX;
+            startY = e.clientY;
+            startWidth = parseInt(document.defaultView.getComputedStyle(panel).width, 10);
+            startHeight = parseInt(document.defaultView.getComputedStyle(panel).height, 10);
+            document.documentElement.addEventListener('mousemove', doResize, false);
+            document.documentElement.addEventListener('mouseup', stopResize, false);
+        });
+
+        function doResize(e) {
+            if (!isResizing) return;
+            const panel = document.getElementById('chatPanel');
+            panel.style.width = (startWidth - (e.clientX - startX)) + 'px';
+            panel.style.height = (startHeight - (e.clientY - startY)) + 'px';
         }
-        
-        closeSettings();
-        showNotification('Settings saved successfully');
+
+        function stopResize() {
+            isResizing = false;
+            document.documentElement.removeEventListener('mousemove', doResize, false);
+            document.documentElement.removeEventListener('mouseup', stopResize, false);
+        }
     }
 
     /**
-     * Handle input changes
+     * Handle sending a message
      */
-    function handleInputChange() {
+    async function handleSend() {
         const input = document.getElementById('chatInput');
-        const sendBtn = document.getElementById('chatSendBtn');
+        const text = input.value.trim();
         
-        // Auto-resize textarea
-        input.style.height = 'auto';
-        input.style.height = Math.min(input.scrollHeight, 120) + 'px';
-        
-        // Enable/disable send button
-        sendBtn.disabled = !input.value.trim();
-    }
-
-    /**
-     * Handle keyboard input
-     */
-    function handleInputKeydown(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    }
-
-    /**
-     * Send message to API
-     */
-    async function sendMessage() {
-        const input = document.getElementById('chatInput');
-        const userMessage = input.value.trim();
-        
-        if (!userMessage || state.isLoading) return;
-        
-        // Refresh API key
-        state.apiKey = getApiKey();
-        
-        if (!state.apiKey) {
-            openSettings();
-            showNotification('Please configure your API key', 'error');
-            return;
-        }
-
-        if (!state.documentContent) {
-            showNotification('Document not loaded. Please refresh the page.', 'error');
-            return;
-        }
-
-        // Clear welcome message on first message
-        if (state.messages.length === 0) {
-            document.getElementById('chatMessages').innerHTML = '';
-        }
+        if (!text || state.isLoading) return;
 
         // Add user message
-        const userMsg = { role: 'user', content: userMessage };
-        state.messages.push(userMsg);
-        appendMessage(userMsg);
+        addMessage({ role: 'user', content: text });
         
         // Clear input
         input.value = '';
-        handleInputChange();
+        input.style.height = 'auto';
         
-        // Show loading
+        // Set loading state
         state.isLoading = true;
-        showTypingIndicator();
-        
+        renderLoading();
+
         try {
-            const response = await callOpenRouter(userMessage);
+            // Get response from AI
+            const response = await fetchAIResponse(text);
             
-            // Add AI response
-            const aiMsg = { role: 'assistant', content: response };
-            state.messages.push(aiMsg);
-            appendMessage(aiMsg);
+            // Remove loading
+            removeLoading();
             
-            // Save messages
-            saveMessages();
+            // Add AI message
+            addMessage({ role: 'assistant', content: response });
             
         } catch (error) {
-            console.error('API Error:', error);
-            appendErrorMessage(error.message);
+            console.error("Chat Error:", error);
+            removeLoading();
+            addMessage({ 
+                role: 'assistant', 
+                content: "I apologize, but I encountered an error connecting to the AI service. Please check your API key in settings." 
+            });
         } finally {
             state.isLoading = false;
-            hideTypingIndicator();
         }
     }
 
     /**
-     * Call OpenRouter API
+     * Add a message to state and UI
      */
-    async function callOpenRouter(userMessage) {
-        const systemPrompt = `You are an expert investment analyst assistant. You have complete access to the following investment memo document. Answer questions accurately based on the document content. Be concise but thorough. Use markdown formatting for better readability (headings, bold, lists). If information is not in the document, say so clearly.
+    function addMessage(msg) {
+        state.messages.push(msg);
+        localStorage.setItem(DEFAULTS.storageKeys.messages, JSON.stringify(state.messages));
+        
+        const container = document.getElementById('chatMessages');
+        
+        // If this is the first message, clear the welcome screen
+        if (state.messages.length === 1) {
+            container.innerHTML = '';
+        }
 
-DOCUMENT:
-${state.documentContent}`;
+        // Append new message
+        const msgDiv = document.createElement('div');
+        msgDiv.innerHTML = renderMessage(msg);
+        container.appendChild(msgDiv.firstElementChild);
+        
+        scrollToBottom();
+    }
+
+    /**
+     * Render a single message
+     */
+    function renderMessage(msg) {
+        const isUser = msg.role === 'user';
+        const avatar = isUser ? icons.user : icons.sparkle;
+        
+        // Parse markdown-ish
+        const formattedContent = msg.content
+            .replace(/\n/g, '<br>')
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\[(.*?)\]/g, '<span class="citation">$1</span>');
+
+        return `
+            <div class="chat-message ${isUser ? 'user' : 'ai'}">
+                <div class="chat-avatar">
+                    ${avatar}
+                </div>
+                <div class="chat-bubble">
+                    <p>${formattedContent}</p>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Render loading indicator
+     */
+    function renderLoading() {
+        const container = document.getElementById('chatMessages');
+        const loadingDiv = document.createElement('div');
+        loadingDiv.id = 'chatLoading';
+        loadingDiv.className = 'chat-message ai';
+        loadingDiv.innerHTML = `
+            <div class="chat-avatar">${icons.sparkle}</div>
+            <div class="chat-bubble">
+                <div class="chat-loading">
+                    <div class="chat-loading-dot"></div>
+                    <div class="chat-loading-dot"></div>
+                    <div class="chat-loading-dot"></div>
+                </div>
+            </div>
+        `;
+        container.appendChild(loadingDiv);
+        scrollToBottom();
+    }
+
+    function removeLoading() {
+        const loading = document.getElementById('chatLoading');
+        loading?.remove();
+    }
+
+    function scrollToBottom() {
+        const container = document.getElementById('chatMessages');
+        if (container) {
+            container.scrollTop = container.scrollHeight;
+        }
+    }
+
+    /**
+     * Fetch response from OpenRouter
+     */
+    async function fetchAIResponse(userMessage) {
+        if (!state.apiKey) {
+            throw new Error("No API Key configured");
+        }
+
+        // Prepare messages with context
+        const systemPrompt = `You are a helpful investment analyst assistant. 
+You have access to an Investment Memo for the "Kajima Wellbeing Real Estate Initiative". 
+Answer questions based on the provided context. 
+Keep answers concise and professional. 
+If you don't know the answer based on the context, say so.
+
+CONTEXT:
+${state.documentContext}`;
 
         const messages = [
-            { role: 'system', content: systemPrompt },
-            ...state.messages.slice(-10).map(m => ({ role: m.role, content: m.content })),
-            { role: 'user', content: userMessage }
+            { role: "system", content: systemPrompt },
+            ...state.messages.slice(-5), // Context window of last 5 messages
+            { role: "user", content: userMessage }
         ];
 
         const response = await fetch(DEFAULTS.apiEndpoint, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${state.apiKey}`,
-                'Content-Type': 'application/json',
-                'HTTP-Referer': window.location.origin,
-                'X-Title': 'Investment Memo Dashboard'
+                'HTTP-Referer': window.location.href, // Required by OpenRouter
+                'X-Title': 'Investment Memo Dashboard',
+                'Content-Type': 'application/json'
             },
             body: JSON.stringify({
                 model: state.selectedModel.id,
                 messages: messages,
                 temperature: 0.7,
-                max_tokens: 2048
+                max_tokens: 1000
             })
         });
 
         if (!response.ok) {
-            const error = await response.json().catch(() => ({}));
-            throw new Error(error.error?.message || `API request failed: ${response.status}`);
+            const errorData = await response.json();
+            throw new Error(errorData.error?.message || 'API Request failed');
         }
 
         const data = await response.json();
-        return data.choices[0]?.message?.content || 'No response received.';
-    }
-
-    /**
-     * Render a message
-     */
-    function renderMessage(msg) {
-        const isUser = msg.role === 'user';
-        const formattedContent = isUser ? escapeHtml(msg.content) : formatMarkdown(msg.content);
-        
-        return `
-            <div class="chat-message ${isUser ? 'user' : 'assistant'}">
-                <div class="message-avatar">
-                    ${isUser ? 'You' : icons.sparkle}
-                </div>
-                <div class="message-body">
-                    <div class="message-content">${formattedContent}</div>
-                    ${!isUser ? `
-                        <div class="message-actions">
-                            <button class="copy-btn" title="Copy response">
-                                ${icons.copy}
-                                <span>Copy</span>
-                            </button>
-                        </div>
-                    ` : ''}
-                </div>
-            </div>
-        `;
-    }
-
-    /**
-     * Escape HTML for user messages
-     */
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    /**
-     * Format markdown content to rich HTML
-     */
-    function formatMarkdown(content) {
-        if (!content) return '';
-        
-        let html = content;
-        
-        // Escape HTML first to prevent XSS
-        html = html
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;');
-        
-        // Code blocks (must be before other processing)
-        html = html.replace(/```(\w*)\n?([\s\S]*?)```/g, (match, lang, code) => {
-            return `<pre class="code-block"><code>${code.trim()}</code></pre>`;
-        });
-        
-        // Inline code
-        html = html.replace(/`([^`]+)`/g, '<code class="inline-code">$1</code>');
-        
-        // Headers (### Header -> <h3>)
-        html = html.replace(/^### (.+)$/gm, '<h4 class="chat-heading">$1</h4>');
-        html = html.replace(/^## (.+)$/gm, '<h3 class="chat-heading">$1</h3>');
-        html = html.replace(/^# (.+)$/gm, '<h2 class="chat-heading">$1</h2>');
-        
-        // Bold (handle ** before *)
-        html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-        
-        // Italic
-        html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-        
-        // Unordered lists - process line by line
-        const lines = html.split('\n');
-        let inList = false;
-        let listItems = [];
-        let result = [];
-        
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-            const listMatch = line.match(/^[\*\-]\s+(.+)$/);
-            
-            if (listMatch) {
-                if (!inList) {
-                    inList = true;
-                    listItems = [];
-                }
-                listItems.push(`<li>${listMatch[1]}</li>`);
-            } else {
-                if (inList) {
-                    result.push(`<ul class="chat-list">${listItems.join('')}</ul>`);
-                    inList = false;
-                    listItems = [];
-                }
-                result.push(line);
-            }
-        }
-        
-        // Close any remaining list
-        if (inList) {
-            result.push(`<ul class="chat-list">${listItems.join('')}</ul>`);
-        }
-        
-        html = result.join('\n');
-        
-        // Numbered lists
-        const numberedLines = html.split('\n');
-        inList = false;
-        listItems = [];
-        result = [];
-        
-        for (let i = 0; i < numberedLines.length; i++) {
-            const line = numberedLines[i];
-            const numMatch = line.match(/^\d+\.\s+(.+)$/);
-            
-            if (numMatch) {
-                if (!inList) {
-                    inList = true;
-                    listItems = [];
-                }
-                listItems.push(`<li>${numMatch[1]}</li>`);
-            } else {
-                if (inList) {
-                    result.push(`<ol class="chat-list numbered">${listItems.join('')}</ol>`);
-                    inList = false;
-                    listItems = [];
-                }
-                result.push(line);
-            }
-        }
-        
-        if (inList) {
-            result.push(`<ol class="chat-list numbered">${listItems.join('')}</ol>`);
-        }
-        
-        html = result.join('\n');
-        
-        // Paragraphs - convert double newlines to paragraph breaks
-        html = html.replace(/\n\n+/g, '</p><p>');
-        
-        // Single newlines to <br> (but not inside lists or pre)
-        html = html.replace(/\n/g, '<br>');
-        
-        // Clean up empty paragraphs and extra breaks
-        html = html.replace(/<p><\/p>/g, '');
-        html = html.replace(/<br><br>/g, '<br>');
-        html = html.replace(/(<\/(?:ul|ol|h[234]|pre)>)<br>/g, '$1');
-        html = html.replace(/<br>(<(?:ul|ol|h[234]|pre))/g, '$1');
-        
-        // Wrap in paragraph if not already wrapped
-        if (!html.startsWith('<')) {
-            html = `<p>${html}</p>`;
-        }
-        
-        return html;
-    }
-
-    /**
-     * Append a message to the chat
-     */
-    function appendMessage(msg) {
-        const messagesContainer = document.getElementById('chatMessages');
-        const messageHtml = renderMessage(msg);
-        messagesContainer.insertAdjacentHTML('beforeend', messageHtml);
-        scrollToBottom();
-    }
-
-    /**
-     * Append an error message
-     */
-    function appendErrorMessage(error) {
-        const messagesContainer = document.getElementById('chatMessages');
-        messagesContainer.insertAdjacentHTML('beforeend', `
-            <div class="chat-message error">
-                <div class="message-body">
-                    <div class="message-content error-content">
-                        <strong>Error:</strong> ${escapeHtml(error)}
-                    </div>
-                </div>
-            </div>
-        `);
-        scrollToBottom();
-    }
-
-    /**
-     * Show typing indicator
-     */
-    function showTypingIndicator() {
-        const messagesContainer = document.getElementById('chatMessages');
-        messagesContainer.insertAdjacentHTML('beforeend', `
-            <div class="chat-message assistant typing-indicator" id="typingIndicator">
-                <div class="message-avatar">${icons.sparkle}</div>
-                <div class="message-body">
-                    <div class="typing-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-                </div>
-            </div>
-        `);
-        scrollToBottom();
-    }
-
-    /**
-     * Hide typing indicator
-     */
-    function hideTypingIndicator() {
-        const indicator = document.getElementById('typingIndicator');
-        if (indicator) {
-            indicator.remove();
-        }
-    }
-
-    /**
-     * Scroll to bottom of messages
-     */
-    function scrollToBottom() {
-        const messagesContainer = document.getElementById('chatMessages');
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
-
-    /**
-     * Clear conversation
-     */
-    function clearConversation() {
-        state.messages = [];
-        localStorage.removeItem(DEFAULTS.storageKeys.messages);
-        document.getElementById('chatMessages').innerHTML = renderWelcomeMessage();
-        showNotification('Conversation cleared');
-    }
-
-    /**
-     * Save messages to localStorage
-     */
-    function saveMessages() {
-        localStorage.setItem(DEFAULTS.storageKeys.messages, JSON.stringify(state.messages));
-    }
-
-    /**
-     * Copy to clipboard
-     */
-    async function copyToClipboard(text, button) {
-        try {
-            await navigator.clipboard.writeText(text);
-            const originalHtml = button.innerHTML;
-            button.innerHTML = `${icons.check}<span>Copied!</span>`;
-            button.classList.add('copied');
-            setTimeout(() => {
-                button.innerHTML = originalHtml;
-                button.classList.remove('copied');
-            }, 2000);
-        } catch (err) {
-            showNotification('Failed to copy', 'error');
-        }
-    }
-
-    /**
-     * Show notification
-     */
-    function showNotification(message, type = 'success') {
-        // Remove existing notification
-        const existing = document.querySelector('.chat-notification');
-        if (existing) existing.remove();
-
-        const notification = document.createElement('div');
-        notification.className = `chat-notification ${type}`;
-        notification.textContent = message;
-        document.body.appendChild(notification);
-
-        setTimeout(() => {
-            notification.classList.add('show');
-        }, 10);
-
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
+        return data.choices[0].message.content;
     }
 
     // Public API
     return {
         init,
-        toggle: togglePanel,
-        open: () => { if (!state.isOpen) togglePanel(); },
-        close: closePanel
+        toggle: toggleChat
     };
 })();
 
-// Initialize when DOM is ready
+// Initialize on load
 document.addEventListener('DOMContentLoaded', () => {
     ChatModule.init();
 });
-
-// Expose to window for external access
-window.ChatModule = ChatModule;

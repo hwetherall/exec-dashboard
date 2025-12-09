@@ -1,13 +1,75 @@
 let currentSectionId = "executive-summary";
 let activeCharts = [];
+let currentDepthMode = "5min"; // Options: "1min", "5min", "10min", "deep"
+
+const DEPTH_MODES = {
+    "1min": { label: "1 MIN", description: "Elevator Verdict", icon: "⚡" },
+    "5min": { label: "5 MIN", description: "Quick Brief", icon: "📋" },
+    "10min": { label: "10 MIN", description: "IC Prep", icon: "📊" },
+    "deep": { label: "DEEP DIVE", description: "Full Analysis", icon: "🔍" }
+};
 
 document.addEventListener("DOMContentLoaded", () => {
+    // Initialize i18n
+    const initialLang = I18n.getLanguage();
+    
+    // Load appropriate data based on language
+    loadDataForLanguage(initialLang);
+    
+    // Listen for language changes
+    I18n.onLanguageChange((lang) => {
+        loadDataForLanguage(lang);
+        // Re-render current view
+        initDashboard(window.memoData);
+        // Re-render sub-components if active
+        if (currentSectionId === 'hypothesis-tracker') {
+            HypothesisTracker.render();
+        } else if (currentSectionId === 'lens-debate') {
+            renderDebateClub(window.memoData);
+        }
+    });
+});
+
+function loadDataForLanguage(lang) {
+    if (lang === 'ja' && window.memoDataJP) {
+        window.memoData = window.memoDataJP;
+    } else {
+        // Fallback to standard memoData (English)
+        // We assume data.js loaded first and defined window.memoData
+        // But if we switched to JP, window.memoData became JP
+        // We need to restore English data. 
+        // Ideally we should have memoDataEN and memoDataJP.
+        // For now, let's reload data.js content if needed or assume 
+        // we can keep a reference to the original English data.
+        if (window.memoDataJP && window.memoData === window.memoDataJP) {
+             // Reload page to restore English data if we don't have a clean reference
+             // Or better: in index.html we loaded data.js which set window.memoData.
+             // Let's save that reference on load.
+             if (!window.memoDataEN) {
+                 // This runs only once hopefully or we need to ensure data.js runs first
+                 // and we capture it.
+                 // Actually, let's handle this by storing EN data in a separate var on first load
+                 console.warn("English data reference lost, reloading page might be needed or ensure data.js saves to a distinct variable.");
+                 location.reload();
+             } else {
+                 window.memoData = window.memoDataEN;
+             }
+        }
+    }
+    
     if (!window.memoData) {
         console.error("Memo data is missing.");
         return;
     }
     initDashboard(window.memoData);
-});
+}
+
+// Store original English data on first load
+// We need to patch data.js to store in memoDataEN too, or do it here if it's already loaded
+if (window.memoData && !window.memoDataEN) {
+    window.memoDataEN = window.memoData;
+}
+
 
 const icons = {
     overview: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
@@ -17,7 +79,8 @@ const icons = {
     grid: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`,
     message: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`,
     target: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>`,
-    logo: `<img src="assets/kajima-logo.png" alt="Kajima Logo" class="logo-img">`
+    logo: `<img src="assets/kajima-logo.png" alt="Kajima Logo" class="logo-img">`,
+    globe: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`
 };
 
 function initDashboard(data) {
@@ -27,7 +90,7 @@ function initDashboard(data) {
             <div class="logo-area">
                 ${icons.logo}
                 <div>
-                    <small>Investment Intelligence</small>
+                    <small>${I18n.t('app.title')}</small>
                 </div>
             </div>
             <div class="sidebar-company-card">
@@ -46,13 +109,21 @@ function initDashboard(data) {
     `;
 
     renderSidebar(data);
-    renderExecutiveSummary(data);
+    
+    // Maintain current section if possible, else default to executive summary
+    if (currentSectionId === "executive-summary") {
+        renderExecutiveSummary(data);
+    } else {
+        handleNavigation(currentSectionId, data);
+    }
 }
 
 function buildHeader(companyInfo) {
     const badgeClass = getStatusBadge(companyInfo.status);
     // Truncate long decision text for the badge, but keep full text accessible
     const shortDecision = companyInfo.decision.split('–')[0].split('with')[0].trim();
+    const currentLang = I18n.getLanguage();
+    const nextLangLabel = currentLang === 'en' ? '日本語' : 'EN';
     
     return `
         <header class="top-header">
@@ -64,6 +135,11 @@ function buildHeader(companyInfo) {
                 <span>${companyInfo.stage}</span>
                 <span>${companyInfo.location}</span>
                 <span class="status-badge ${badgeClass}" title="${companyInfo.decision}">${shortDecision}</span>
+                
+                <button class="lang-toggle" id="langToggle" onclick="I18n.toggleLanguage()">
+                    <span class="lang-toggle-icon">${icons.globe}</span>
+                    <span>${nextLangLabel}</span>
+                </button>
             </div>
         </header>
     `;
@@ -84,15 +160,15 @@ function renderSidebar(data) {
     const navMenu = document.getElementById("navMenu");
     const navSections = [
         {
-            label: "Overview",
-            items: [{ id: "executive-summary", label: "Executive Summary", icon: icons.overview }],
+            label: I18n.t("nav.overview"),
+            items: [{ id: "executive-summary", label: I18n.t("nav.exec_summary"), icon: icons.overview }],
         },
         {
-            label: "Planning",
-            items: [{ id: "hypothesis-tracker", label: "Hypothesis Tracker", icon: icons.target }],
+            label: I18n.t("nav.planning"),
+            items: [{ id: "hypothesis-tracker", label: I18n.t("nav.hypothesis_tracker"), icon: icons.target }],
         },
         {
-            label: "Chapters",
+            label: I18n.t("nav.chapters"),
             items: data.chapters.map((chapter) => ({
                 id: chapter.id,
                 label: chapter.title,
@@ -100,15 +176,15 @@ function renderSidebar(data) {
             })),
         },
         {
-            label: "Risk",
-            items: [{ id: "six-t-risk", label: "6T Risk Matrix", icon: icons.risk }],
+            label: I18n.t("nav.risk"),
+            items: [{ id: "six-t-risk", label: I18n.t("nav.six_t_risk"), icon: icons.risk }],
         },
         {
-            label: "Decision Lens",
+            label: I18n.t("nav.decision_lens"),
             items: [
-                { id: "lens-belief", label: "Belief Check", icon: icons.checkmark },
-                { id: "lens-strategy", label: "Strategy Matrix", icon: icons.grid },
-                { id: "lens-debate", label: "Debate Club", icon: icons.message },
+                { id: "lens-belief", label: I18n.t("nav.belief_check"), icon: icons.checkmark },
+                { id: "lens-strategy", label: I18n.t("nav.strategy_matrix"), icon: icons.grid },
+                { id: "lens-debate", label: I18n.t("nav.debate_club"), icon: icons.message },
             ],
         },
     ];
@@ -142,7 +218,7 @@ function renderSidebar(data) {
 }
 
 function handleNavigation(targetId, data) {
-    if (targetId === currentSectionId) return;
+    // Don't return early if clicking same tab, as we might need to re-render language
     currentSectionId = targetId;
 
     document
@@ -196,11 +272,231 @@ function triggerAnimation() {
     }
 }
 
+function renderDepthModeSwitcher() {
+    const modes = Object.entries(DEPTH_MODES).map(([key, mode]) => `
+        <button class="depth-mode-btn ${currentDepthMode === key ? 'active' : ''}" data-mode="${key}">
+            <span class="depth-mode-icon">${mode.icon}</span>
+            <span class="depth-mode-label">${mode.label}</span>
+            <span class="depth-mode-desc">${mode.description}</span>
+        </button>
+    `).join('');
+
+    return `
+        <div class="depth-mode-switcher">
+            <div class="depth-mode-header">
+                <span class="depth-mode-question">${I18n.t("depth.question")}</span>
+            </div>
+            <div class="depth-mode-buttons">
+                ${modes}
+            </div>
+        </div>
+    `;
+}
+
+function setupDepthModeListeners() {
+    document.querySelectorAll('.depth-mode-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const newMode = e.currentTarget.dataset.mode;
+            if (newMode !== currentDepthMode) {
+                currentDepthMode = newMode;
+                renderExecutiveSummary(window.memoData);
+            }
+        });
+    });
+}
+
 function renderExecutiveSummary(data) {
     triggerAnimation();
     destroyActiveCharts();
     const container = document.getElementById("contentContainer");
 
+    // Build content based on depth mode
+    let content = '';
+    
+    // Always show the depth mode switcher first
+    content += renderDepthModeSwitcher();
+
+    // 1 MINUTE MODE - Just the verdict
+    content += render1MinContent(data);
+
+    // 5 MINUTE MODE - Add opportunities, risks, should/can
+    if (["5min", "10min", "deep"].includes(currentDepthMode)) {
+        content += render5MinContent(data);
+    }
+
+    // 10 MINUTE MODE - Add 6T breakdown, capability gaps, action plan
+    if (["10min", "deep"].includes(currentDepthMode)) {
+        content += render10MinContent(data);
+    }
+
+    // DEEP DIVE MODE - Add all remaining content
+    if (currentDepthMode === "deep") {
+        content += renderDeepDiveContent(data);
+    }
+
+    container.innerHTML = content;
+    
+    // Setup event listeners for depth mode buttons
+    setupDepthModeListeners();
+}
+
+function render1MinContent(data) {
+    const decisionClass = data.companyInfo.status === "pass" ? "verdict-pass" : 
+                          data.companyInfo.status === "invest" ? "verdict-go" : "verdict-conditional";
+    
+    return `
+        <!-- VERDICT BANNER -->
+        <div class="verdict-banner ${decisionClass}">
+            <div class="verdict-badge">
+                <span class="verdict-icon">${data.companyInfo.status === "pass" ? "🔴" : data.companyInfo.status === "invest" ? "🟢" : "🟡"}</span>
+                <span class="verdict-text">${data.companyInfo.decision}</span>
+            </div>
+            <p class="verdict-oneliner">${data.executiveSummary.recommendation.detail}</p>
+        </div>
+
+        <!-- THE QUICK STATS -->
+        <div class="quick-stats-row">
+            <div class="quick-stat">
+                <span class="quick-stat-label">${I18n.t("depth.the_ask")}</span>
+                <span class="quick-stat-value">${data.depthMode?.theAsk || "¥30M / 120 Days"}</span>
+            </div>
+            <div class="quick-stat">
+                <span class="quick-stat-label">${I18n.t("depth.the_prize")}</span>
+                <span class="quick-stat-value">${data.depthMode?.thePrize || "$438B TAM"}</span>
+            </div>
+            <div class="quick-stat blocker">
+                <span class="quick-stat-label">${I18n.t("depth.the_blocker")}</span>
+                <span class="quick-stat-value">${data.depthMode?.theBlocker || "APPI Privacy"}</span>
+            </div>
+        </div>
+
+        <!-- GUT CHECK QUOTE -->
+        <div class="gut-check-quote">
+            <div class="quote-icon">💬</div>
+            <blockquote>${data.depthMode?.gutCheck || "Let them sell one pilot to a stranger first. If they can't get a signed check without us subsidizing it, we kill the tech layer."}</blockquote>
+        </div>
+    `;
+}
+
+function render5MinContent(data) {
+    return `
+        <!-- KEY METRICS STRIP -->
+        ${renderSummaryWidgets(data.summaryStats)}
+
+        <!-- OPPORTUNITIES VS RISKS -->
+        ${renderOpportunitiesRisks(data)}
+
+        <!-- SHOULD WE / CAN WE -->
+        <section class="should-can-section">
+            <h3>${I18n.t("depth.strategic_tension")}</h3>
+            <div class="should-can-grid">
+                <div class="should-can-card should">
+                    <h4>${I18n.t("matrix.should_we")}</h4>
+                    <div class="should-can-rating">${data.executiveSummary.matrix.shouldWeDoIt}</div>
+                    <p>${data.executiveSummary.matrix.shouldWeDoItText}</p>
+                </div>
+                <div class="should-can-card can">
+                    <h4>${I18n.t("matrix.can_we")}</h4>
+                    <div class="should-can-rating">${data.executiveSummary.matrix.canWeDoIt}</div>
+                    <p>${data.executiveSummary.matrix.canWeDoItText}</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- GO CONDITIONS -->
+        <section class="go-conditions">
+            <h3>${I18n.t("depth.go_conditions")}</h3>
+            <div class="conditions-list">
+                ${(data.depthMode?.goConditions || [
+                    "APPI legal opinion confirms deployability in corporate settings",
+                    "1+ signed LOI from non-Kajima client at hardware premium price",
+                    "Pilot data shows >15% improvement in occupant satisfaction"
+                ]).map(condition => `
+                    <div class="condition-item">
+                        <span class="condition-checkbox">☐</span>
+                        <span class="condition-text">${condition}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </section>
+    `;
+}
+
+function render10MinContent(data) {
+    // Build 6T Risk Scorecard
+    const sixTCards = data.riskAnalysis.sixTs.map(risk => {
+        const severityClass = risk.severity === "high" ? "severity-high" : 
+                             risk.severity === "medium" ? "severity-medium" : "severity-low";
+        return `
+            <div class="sixT-row ${severityClass}">
+                <div class="sixT-name">${risk.title}</div>
+                <div class="sixT-severity">
+                    <span class="severity-badge ${risk.severity}">${risk.severity.toUpperCase()}</span>
+                </div>
+                <div class="sixT-summary">${risk.summary}</div>
+            </div>
+        `;
+    }).join('');
+
+    return `
+        <!-- 6T RISK SCORECARD -->
+        <section class="sixT-scorecard">
+            <h3>${I18n.t("depth.sixT_scorecard")}</h3>
+            <div class="sixT-table">
+                ${sixTCards}
+            </div>
+        </section>
+
+        <!-- CAPABILITY GAPS -->
+        ${renderCapabilityGaps(data.capabilityGaps)}
+
+        <!-- 120-DAY VALIDATION PLAN -->
+        <section class="validation-plan">
+            <h3>${I18n.t("depth.validation_plan")}</h3>
+            <div class="plan-phases">
+                ${(data.depthMode?.validationPlan || [
+                    { phase: "1", title: "Packaging", days: "Days 1-30", tasks: ["Define 'Wellbeing SKU' (Soto-beya + sensors)", "Create ROI-focused sales deck"], output: "Sales Deck & Pricing Model" },
+                    { phase: "2", title: "Sales Testing", days: "Days 31-90", tasks: ["Pitch to 15 existing corporate clients", "Test specific pricing tiers"], output: "3+ LOIs at 10%+ premium" },
+                    { phase: "3", title: "Compliance", days: "Days 31-60", tasks: ["Third-party APPI audit of sensor suite"], output: "Clean legal opinion" },
+                    { phase: "4", title: "Decision Gate", days: "Day 120", tasks: ["🟢 GO if: 3+ LOIs + Clean legal + Pilot data", "🟡 PIVOT if: Interest but no premium", "🔴 KILL if: Zero LOIs or regulatory block"], output: "Final Recommendation" }
+                ]).map(phase => `
+                    <div class="plan-phase">
+                        <div class="phase-header">
+                            <span class="phase-number">Phase ${phase.phase}</span>
+                            <span class="phase-title">${phase.title}</span>
+                            <span class="phase-days">${phase.days}</span>
+                        </div>
+                        <div class="phase-tasks">
+                            ${phase.tasks.map(task => `<div class="phase-task">• ${task}</div>`).join('')}
+                        </div>
+                        <div class="phase-output">
+                            <strong>Output:</strong> ${phase.output}
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </section>
+
+        <!-- DISCUSSION QUESTIONS -->
+        <section class="discussion-questions">
+            <h3>${I18n.t("depth.discussion_questions")}</h3>
+            <div class="questions-list">
+                ${(data.depthMode?.discussionQuestions || [
+                    "Are we willing to create a separate comp band to hire data scientists who earn more than our senior engineers?",
+                    "If APPI blocks biometric sensing, does the remaining 'low-tech' wellness market justify this R&D investment?",
+                    "Why haven't we sold a pilot yet? Is it price, product, or channel?"
+                ]).map((q, i) => `
+                    <div class="question-item">
+                        <span class="question-number">${i + 1}</span>
+                        <span class="question-text">"${q}"</span>
+                    </div>
+                `).join('')}
+            </div>
+        </section>
+    `;
+}
+
+function renderDeepDiveContent(data) {
     const highlights = data.executiveSummary.highlights
         .map(
             (highlight) => `
@@ -212,86 +508,67 @@ function renderExecutiveSummary(data) {
         )
         .join("");
 
-    container.innerHTML = `
+    return `
         <!-- Strategic Goal Banner -->
         <div class="strategic-banner">
-            <h2>Strategic Goal</h2>
+            <h2>${I18n.t("exec.strategic_goal")}</h2>
             <p>${data.executiveSummary.strategicGoal}</p>
-        </div>
-
-        <!-- Strategic Recommendation -->
-        <div class="recommendation-block">
-            <p class="rec-label">Strategic Recommendation</p>
-            <h3 class="rec-title">${data.executiveSummary.recommendation.title}</h3>
-            <p class="rec-detail">${data.executiveSummary.recommendation.detail}</p>
         </div>
 
         <!-- Strategic Highlights -->
         <section class="content-block">
-            <h3>Strategic Highlights</h3>
+            <h3>${I18n.t("exec.strategic_highlights")}</h3>
             <div class="highlight-grid">
                 ${highlights}
             </div>
         </section>
-
-        ${renderSummaryWidgets(data.summaryStats)}
-
-        <!-- Opportunities vs Risks Split Panel -->
-        ${renderOpportunitiesRisks(data)}
-
-        <!-- Capability Gaps -->
-        ${renderCapabilityGaps(data.capabilityGaps)}
 
         <!-- 6T Risk Overview -->
         ${renderRiskMatrixCard(data.riskAnalysis, true)}
 
         <!-- Strategic Matrix -->
         <section class="content-block">
-            <h3>Strategic Matrix</h3>
+            <h3>${I18n.t("exec.strategic_matrix")}</h3>
             <div class="matrix-container">
                 <div class="matrix-grid-wrapper">
-                    <div class="matrix-axis-y"><span>Strategic Fit (Should We?)</span></div>
+                    <div class="matrix-axis-y"><span>${I18n.t("matrix.y_axis")}</span></div>
                     <div class="matrix-2x2">
                         <div class="quadrant top-left">
-                            <span class="quadrant-label">Strategy without Capability</span>
+                            <span class="quadrant-label">${I18n.t("matrix.quad.top_left")}</span>
                         </div>
                         <div class="quadrant top-right">
-                            <span class="quadrant-label">Clear Winner</span>
+                            <span class="quadrant-label">${I18n.t("matrix.quad.top_right")}</span>
                         </div>
                         <div class="quadrant bottom-left">
-                            <span class="quadrant-label">No Go</span>
+                            <span class="quadrant-label">${I18n.t("matrix.quad.bottom_left")}</span>
                         </div>
                         <div class="quadrant bottom-right">
-                            <span class="quadrant-label">Execution without Strategy</span>
+                            <span class="quadrant-label">${I18n.t("matrix.quad.bottom_right")}</span>
                         </div>
                         
                         <!-- Dynamic Marker -->
                         <div class="matrix-marker-dot" style="top: 75%; left: 75%;">
-                            <div class="marker-label">You Are Here</div>
+                            <div class="marker-label">${I18n.t("matrix.you_are_here")}</div>
                         </div>
                     </div>
                 </div>
-                <div class="matrix-axis-x"><span>Execution Capacity (Can We?)</span></div>
+                <div class="matrix-axis-x"><span>${I18n.t("matrix.x_axis")}</span></div>
                 
                 <div class="matrix-text-summary">
                     <div class="matrix-text-item">
-                        <strong>Can We Do It?</strong>: ${data.executiveSummary.matrix.canWeDoIt}
+                        <strong>${I18n.t("matrix.can_we")}</strong>: ${data.executiveSummary.matrix.canWeDoIt}
                         <p>${data.executiveSummary.matrix.canWeDoItText}</p>
                     </div>
                     <div class="matrix-text-item">
-                        <strong>Should We Do It?</strong>: ${data.executiveSummary.matrix.shouldWeDoIt}
+                        <strong>${I18n.t("matrix.should_we")}</strong>: ${data.executiveSummary.matrix.shouldWeDoIt}
                         <p>${data.executiveSummary.matrix.shouldWeDoItText}</p>
                     </div>
                 </div>
             </div>
         </section>
     `;
-    
-    // Initialize the risk radar chart after DOM update
-    setTimeout(() => {
-        initRiskRadarChart(data.riskAnalysis.sixTs, 'riskRadarChartCompact');
-    }, 50);
 }
+
 
 function renderOpportunitiesRisks(data) {
     const opportunities = data.executiveSummary.keyOpportunities || [];
@@ -329,7 +606,7 @@ function renderOpportunitiesRisks(data) {
                             <polyline points="17 6 23 6 23 12"></polyline>
                         </svg>
                     </div>
-                    <h3 class="split-col-title">Key Opportunities</h3>
+                    <h3 class="split-col-title">${I18n.t("exec.key_opportunities")}</h3>
                 </div>
                 ${opportunityItems}
             </div>
@@ -342,7 +619,7 @@ function renderOpportunitiesRisks(data) {
                             <line x1="12" y1="17" x2="12.01" y2="17"></line>
                         </svg>
                     </div>
-                    <h3 class="split-col-title">Critical Risks to Resolve</h3>
+                    <h3 class="split-col-title">${I18n.t("exec.critical_risks")}</h3>
                 </div>
                 ${riskItems}
             </div>
@@ -368,7 +645,7 @@ function renderCapabilityGaps(gaps) {
     return `
         <section class="capability-gaps">
             <div class="capability-gaps-header">
-                <h3>Critical Capability Gaps</h3>
+                <h3>${I18n.t("exec.capability_gaps")}</h3>
             </div>
             <div class="capability-gaps-grid">
                 ${gapCards}
@@ -397,7 +674,7 @@ function renderRoadmapTimeline(stages) {
 
     return `
         <section class="content-block">
-            <h3>Implementation Roadmap</h3>
+            <h3>${I18n.t("exec.roadmap")}</h3>
             <div class="roadmap-timeline">
                 ${stageItems}
             </div>
@@ -438,22 +715,22 @@ function renderFinancialDashboard(financialData) {
         <div class="financial-grid">
             <div class="financial-card">
                 <div class="financial-card-header">
-                    <h4 class="financial-card-title">Unit Economics</h4>
-                    <span class="financial-card-badge">Core Metrics</span>
+                    <h4 class="financial-card-title">${I18n.t("fin.unit_economics")}</h4>
+                    <span class="financial-card-badge">${I18n.t("fin.core_metrics")}</span>
                 </div>
                 ${unitEconomicsRows}
             </div>
             <div class="financial-card">
                 <div class="financial-card-header">
-                    <h4 class="financial-card-title">Revenue Model</h4>
-                    <span class="financial-card-badge">Revenue Streams</span>
+                    <h4 class="financial-card-title">${I18n.t("fin.revenue_model")}</h4>
+                    <span class="financial-card-badge">${I18n.t("fin.revenue_streams")}</span>
                 </div>
                 ${revenueModelRows}
             </div>
         </div>
         ${assumptions.length ? `
         <section class="content-block">
-            <h3>Key Assumptions to Validate</h3>
+            <h3>${I18n.t("fin.assumptions")}</h3>
             <ul class="watchouts">
                 ${assumptions}
             </ul>
@@ -462,18 +739,18 @@ function renderFinancialDashboard(financialData) {
         <div class="financial-grid">
             <div class="financial-card">
                 <div class="financial-card-header">
-                    <h4 class="financial-card-title">Revenue Projection</h4>
+                    <h4 class="financial-card-title">${I18n.t("fin.revenue_proj")}</h4>
                 </div>
                 <div class="chart-placeholder">
-                    Chart data pending — awaiting Carson's input
+                    ${I18n.t("fin.chart_pending")}
                 </div>
             </div>
             <div class="financial-card">
                 <div class="financial-card-header">
-                    <h4 class="financial-card-title">Burn Rate Analysis</h4>
+                    <h4 class="financial-card-title">${I18n.t("fin.burn_rate")}</h4>
                 </div>
                 <div class="chart-placeholder">
-                    Chart data pending — awaiting Carson's input
+                    ${I18n.t("fin.chart_pending")}
                 </div>
             </div>
         </div>
@@ -482,34 +759,16 @@ function renderFinancialDashboard(financialData) {
 
 function renderRiskMatrixCard(riskAnalysis, compact = false) {
     const riskGrid = renderRiskGrid(riskAnalysis.sixTs, compact);
-    const canvasId = compact ? 'riskRadarChartCompact' : 'riskRadarChartFull';
-    const radarMarkup = renderRiskRadar(riskAnalysis.sixTs, canvasId);
-    
-    const chartIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>`;
-    const gridIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>`;
     
     return `
         <section class="risk-matrix" id="riskMatrixSection">
             <div class="risk-matrix-header">
                 <div class="risk-matrix-header-content">
-                    <h3>6T Risk Overview</h3>
+                    <h3>${I18n.t("exec.risk_overview")}</h3>
                     <p class="risk-summary">${riskAnalysis.overall}</p>
                 </div>
-                <div class="view-toggle-container">
-                    <button class="view-toggle-btn active" data-view="chart" onclick="toggleRiskView('chart', '${canvasId}')">
-                        ${chartIcon}
-                        Chart
-                    </button>
-                    <button class="view-toggle-btn" data-view="cards" onclick="toggleRiskView('cards', '${canvasId}')">
-                        ${gridIcon}
-                        Cards
-                    </button>
-                </div>
             </div>
-            <div class="risk-view-chart ${compact ? 'compact' : ''}" id="riskViewChart">
-                ${radarMarkup}
-            </div>
-            <div class="risk-view-cards" id="riskViewCards" style="display: none;">
+            <div class="risk-content">
                 ${riskGrid}
             </div>
         </section>
@@ -517,253 +776,78 @@ function renderRiskMatrixCard(riskAnalysis, compact = false) {
 }
 
 function renderRiskGrid(items, compact = false) {
-    const gridItems = items
+    return `
+        <div class="risk-grid">
+            ${items.map(item => `
+                <div class="risk-card">
+                    <div class="risk-card-header">
+                        <span class="risk-title">${item.title}</span>
+                        <span class="risk-badge ${item.severity}">${item.severity}</span>
+                    </div>
+                    <div class="risk-rating">${item.rating}</div>
+                    <p class="risk-desc">${item.summary}</p>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+
+
+
+function renderSummaryWidgets(stats) {
+    const widgets = stats
         .map(
-            (item) => `
-            <div class="risk-item ${item.severity}" data-risk="${item.title}">
-                <div class="risk-title">${item.title}</div>
-                <div class="risk-rating">${item.rating}</div>
-                <p class="risk-detail">${item.summary}</p>
+            (stat) => `
+            <div class="widget-card">
+                <p class="widget-label">${stat.label}</p>
+                <p class="widget-value">${stat.value}</p>
+                <p class="widget-helper">${stat.helper}</p>
             </div>
         `
         )
         .join("");
 
     return `
-        <div class="risk-grid ${compact ? "compact" : ""}">
-            ${gridItems}
-        </div>
+        <section class="summary-widgets">
+            ${widgets}
+        </section>
     `;
 }
 
-function severityToValue(severity) {
-    const map = { high: 3, medium: 2, low: 1 };
-    return map[severity] || 1;
+function destroyActiveCharts() {
+    activeCharts.forEach(chart => chart.destroy());
+    activeCharts = [];
 }
 
-function renderRiskRadar(sixTs, canvasId = 'riskRadarChart') {
-    const labels = sixTs.map(t => t.title);
-    const values = sixTs.map(t => severityToValue(t.severity));
-    
-    return `
-        <div class="risk-radar-container">
-            <div class="risk-radar-chart-wrapper">
-                <canvas id="${canvasId}"></canvas>
-            </div>
-            <div class="risk-radar-legend">
-                <div class="legend-title">Risk Severity Scale</div>
-                <div class="legend-items">
-                    <div class="legend-item">
-                        <span class="legend-dot high"></span>
-                        <span>High Risk (3)</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-dot medium"></span>
-                        <span>Medium Risk (2)</span>
-                    </div>
-                    <div class="legend-item">
-                        <span class="legend-dot low"></span>
-                        <span>Low Risk (1)</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-}
 
-function initRiskRadarChart(sixTs, canvasId = 'riskRadarChart') {
-    const canvas = document.getElementById(canvasId);
-    if (!canvas || typeof Chart === "undefined") return null;
 
-    const labels = sixTs.map(t => t.title);
-    const values = sixTs.map(t => severityToValue(t.severity));
-    const colors = sixTs.map(t => {
-        if (t.severity === 'high') return 'rgba(185, 28, 28, 0.8)';
-        if (t.severity === 'medium') return 'rgba(180, 83, 9, 0.8)';
-        return 'rgba(21, 128, 61, 0.8)';
-    });
 
-    const config = {
-        type: 'radar',
-        data: {
-            labels: labels,
-            datasets: [{
-                label: '6T Risk Profile',
-                data: values,
-                backgroundColor: 'rgba(30, 58, 95, 0.2)',
-                borderColor: 'rgba(30, 58, 95, 0.8)',
-                borderWidth: 2,
-                pointBackgroundColor: colors,
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 6,
-                pointHoverRadius: 8,
-                pointHoverBackgroundColor: colors,
-                pointHoverBorderColor: '#fff',
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
-                    titleFont: {
-                        family: "'DM Sans', sans-serif",
-                        size: 13,
-                        weight: '600'
-                    },
-                    bodyFont: {
-                        family: "'DM Sans', sans-serif",
-                        size: 12
-                    },
-                    padding: 12,
-                    cornerRadius: 8,
-                    callbacks: {
-                        title: function(context) {
-                            return context[0].label;
-                        },
-                        label: function(context) {
-                            const index = context.dataIndex;
-                            const risk = sixTs[index];
-                            const severityLabel = risk.severity.charAt(0).toUpperCase() + risk.severity.slice(1);
-                            return [`Severity: ${severityLabel}`, `${risk.rating}`];
-                        },
-                        afterLabel: function(context) {
-                            const index = context.dataIndex;
-                            const risk = sixTs[index];
-                            // Wrap long summary text
-                            const words = risk.summary.split(' ');
-                            const lines = [];
-                            let currentLine = '';
-                            words.forEach(word => {
-                                if ((currentLine + word).length > 40) {
-                                    lines.push(currentLine.trim());
-                                    currentLine = word + ' ';
-                                } else {
-                                    currentLine += word + ' ';
-                                }
-                            });
-                            if (currentLine.trim()) lines.push(currentLine.trim());
-                            return lines;
-                        }
-                    }
-                }
-            },
-            scales: {
-                r: {
-                    beginAtZero: true,
-                    min: 0,
-                    max: 3,
-                    ticks: {
-                        stepSize: 1,
-                        display: false
-                    },
-                    grid: {
-                        color: 'rgba(148, 163, 184, 0.3)',
-                        circular: true
-                    },
-                    angleLines: {
-                        color: 'rgba(148, 163, 184, 0.3)'
-                    },
-                    pointLabels: {
-                        font: {
-                            family: "'Source Serif 4', Georgia, serif",
-                            size: 13,
-                            weight: '600'
-                        },
-                        color: '#0f172a',
-                        padding: 15
-                    }
-                }
-            },
-            elements: {
-                line: {
-                    tension: 0.1
-                }
-            },
-            onHover: function(event, elements) {
-                const canvas = event.native.target;
-                canvas.style.cursor = elements.length ? 'pointer' : 'default';
-                
-                // Highlight corresponding risk card
-                document.querySelectorAll('.risk-item').forEach(item => {
-                    item.classList.remove('highlighted');
-                });
-                
-                if (elements.length > 0) {
-                    const index = elements[0].index;
-                    const riskTitle = sixTs[index].title;
-                    const riskCard = document.querySelector(`.risk-item[data-risk="${riskTitle}"]`);
-                    if (riskCard) {
-                        riskCard.classList.add('highlighted');
-                    }
-                }
-            },
-            onClick: function(event, elements) {
-                if (elements.length > 0) {
-                    const index = elements[0].index;
-                    const riskTitle = sixTs[index].title;
-                    
-                    // Switch to cards view
-                    window.toggleRiskView('cards', canvasId);
-                    
-                    // Scroll to and highlight the clicked risk card
-                    setTimeout(() => {
-                        const riskCard = document.querySelector(`.risk-item[data-risk="${riskTitle}"]`);
-                        if (riskCard) {
-                            riskCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            riskCard.classList.add('highlighted');
-                            
-                            // Remove highlight after a delay
-                            setTimeout(() => {
-                                riskCard.classList.remove('highlighted');
-                            }, 2000);
-                        }
-                    }, 100);
-                }
-            }
-        }
-    };
-
-    const chartInstance = new Chart(canvas.getContext('2d'), config);
-    activeCharts.push(chartInstance);
-    return chartInstance;
-}
 
 function renderChapter(chapter) {
     triggerAnimation();
     destroyActiveCharts();
     const container = document.getElementById("contentContainer");
+
+    // Setup chart placeholders if any
     const chartMounts = [];
-    const chartsMarkup = (chapter.charts || [])
-        .map((chart, index) => {
-            const canvasId = `${chapter.id}-${chart.id || index}`;
-            chartMounts.push({ canvasId, chart });
-            return `
-                <div class="chart-card">
-                    <div class="chart-card-header">
-                        <h4>${chart.title}</h4>
-                    </div>
-                    <canvas id="${canvasId}"></canvas>
-                </div>
-            `;
-        })
-        .join("");
+    let chartsMarkup = "";
+
+    if (chapter.charts && chapter.charts.length) {
+        chartsMarkup = chapter.charts.map(c => {
+            chartMounts.push(c);
+            return `<div class="chart-container"><canvas id="${c.id}"></canvas></div>`;
+        }).join("");
+    }
 
     const tablesMarkup = (chapter.tables || [])
         .map(
             (table) => `
-            <div class="content-block">
-                <h3>${table.title}</h3>
+            <div class="data-table-container">
                 <table class="data-table">
                     <thead>
                         <tr>
-                            ${table.headers.map((header) => `<th>${header}</th>`).join("")}
+                            ${table.headers.map((h) => `<th>${h}</th>`).join("")}
                         </tr>
                     </thead>
                     <tbody>
@@ -809,7 +893,7 @@ function renderChapter(chapter) {
 
     container.innerHTML = `
         <section class="chapter-header">
-            <p class="eyebrow">Chapter</p>
+            <p class="eyebrow">${I18n.t("common.chapter")}</p>
             <h2 class="chapter-title">${chapter.title}</h2>
             <p class="chapter-summary">${chapter.summary}</p>
         </section>
@@ -830,149 +914,69 @@ function renderChapter(chapter) {
     initCharts(chartMounts);
 
     // Initialize Sensitivity Panel for Financial chapter
-    if (chapter.id === 'financial-operational' && window.initSensitivityPanel) {
-        window.initSensitivityPanel('contentContainer');
+    if (chapter.id === "financial-operational") {
+        renderSensitivityPanel('contentContainer');
     }
 }
 
 function renderMetrics(metrics) {
     if (!metrics.length) return "";
-    const cards = metrics
-        .map(
-            (metric) => `
-            <div class="metric-card">
-                <div class="metric-number">${metric.value}</div>
-                <div class="metric-label">${metric.label}</div>
-                <p class="metric-desc">${metric.description}</p>
-            </div>
-        `
-        )
-        .join("");
-    return `<div class="metrics-grid">${cards}</div>`;
+    return `
+        <div class="summary-widgets">
+            ${metrics.map(m => `
+                <div class="widget-card">
+                    <p class="widget-label">${m.label}</p>
+                    <p class="widget-value">${m.value}</p>
+                    <p class="widget-helper">${m.description}</p>
+                </div>
+            `).join("")}
+        </div>
+    `;
 }
 
-function renderSummaryWidgets(stats) {
-    if (!stats.length) return "";
-    const widgets = stats
-        .map(
-            (item) => `
-            <div class="widget-card">
-                <p class="widget-label">${item.label}</p>
-                <p class="widget-value">${item.value}</p>
-                <p class="widget-helper">${item.helper}</p>
-            </div>
-        `
-        )
-        .join("");
-    return `<div class="summary-widgets">${widgets}</div>`;
-}
-
-function initCharts(mounts) {
-    if (!Array.isArray(mounts) || !mounts.length) return;
-    destroyActiveCharts();
-
-    mounts.forEach(({ canvasId, chart }) => {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas || typeof Chart === "undefined") return;
-
-        const config = {
-            type: chart.type,
-            data: {
-                labels: chart.labels,
-                datasets: chart.datasets,
-            },
-            options: chart.options || {
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: "#1e293b",
-                        },
-                    },
+function initCharts(chartConfigs) {
+    chartConfigs.forEach(config => {
+        const ctx = document.getElementById(config.id);
+        if (ctx) {
+            const chart = new Chart(ctx, {
+                type: config.type,
+                data: {
+                    labels: config.labels,
+                    datasets: config.datasets
                 },
-                scales: {
-                    x: {
-                        ticks: { color: "#64748b" },
-                        grid: { color: "#e2e8f0" },
-                    },
-                    y: {
-                        ticks: { color: "#64748b" },
-                        grid: { color: "#e2e8f0" },
-                    },
-                },
-            },
-        };
-
-        const chartInstance = new Chart(canvas.getContext("2d"), config);
-        activeCharts.push(chartInstance);
+                options: config.options || {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: true, text: config.title }
+                    }
+                }
+            });
+            activeCharts.push(chart);
+        }
     });
 }
 
-function destroyActiveCharts() {
-    if (!activeCharts.length) return;
-    activeCharts.forEach((chart) => chart.destroy());
-    activeCharts = [];
-}
-
-// Global function for toggle buttons
-window.toggleRiskView = function(view, canvasId) {
-    const chartView = document.getElementById('riskViewChart');
-    const cardsView = document.getElementById('riskViewCards');
-    const buttons = document.querySelectorAll('.view-toggle-btn');
-    
-    buttons.forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.view === view);
-    });
-    
-    if (view === 'chart') {
-        chartView.style.display = 'block';
-        cardsView.style.display = 'none';
-    } else {
-        chartView.style.display = 'none';
-        cardsView.style.display = 'block';
-    }
-}
-
-// Store sixTs data globally for chart initialization
-let currentSixTs = null;
-
+// Lens Renders
 function renderBeliefLens(data) {
     triggerAnimation();
     destroyActiveCharts();
     const container = document.getElementById("contentContainer");
     const beliefs = data.decisionFrameworks.beliefLens || [];
 
-    const beliefCards = beliefs
-        .map(
-            (belief) => {
-                const statusClass = belief.status.toLowerCase().replace(/\s+/g, '-');
-                return `
-                <div class="belief-card ${statusClass}">
-                    <div class="belief-card-header">
-                        <div class="belief-checkbox">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="20 6 9 17 4 12"></polyline>
-                            </svg>
-                        </div>
-                        <div class="belief-title-group">
-                            <h3 class="belief-title">${belief.belief}</h3>
-                            <span class="belief-status-badge ${statusClass}">${belief.status}</span>
-                        </div>
-                    </div>
-                    <p class="belief-statement">${belief.statement}</p>
-                </div>
-            `;
-            }
-        )
-        .join("");
-
     container.innerHTML = `
         <section class="chapter-header">
-            <p class="eyebrow">Decision Lens</p>
-            <h2 class="chapter-title">Belief Check</h2>
-            <p class="chapter-summary">Critical assumptions that must be validated before proceeding. Each belief represents a key hypothesis about market behavior, technology feasibility, or competitive advantage.</p>
+            <p class="eyebrow">${I18n.t("nav.decision_lens")}</p>
+            <h2 class="chapter-title">${I18n.t("nav.belief_check")}</h2>
         </section>
-        <div class="belief-lens-container">
-            ${beliefCards}
+        <div class="lens-grid">
+            ${beliefs.map(b => `
+                <div class="lens-card">
+                    <span class="belief-status">${b.status}</span>
+                    <h3 style="margin: 1rem 0 0.5rem 0; font-size: 1.1rem;">${b.belief}</h3>
+                    <p class="lens-statement">"${b.statement}"</p>
+                </div>
+            `).join("")}
         </div>
     `;
 }
@@ -981,87 +985,40 @@ function renderStrategicLens(data) {
     triggerAnimation();
     destroyActiveCharts();
     const container = document.getElementById("contentContainer");
-    const strategic = data.decisionFrameworks.strategicLens || {};
-
-    const shouldWe = strategic.shouldWe || {};
-    const canWe = strategic.canWe || {};
-
-    // Calculate matrix position based on ratings (simplified logic)
-    const shouldWeValue = shouldWe.rating && shouldWe.rating.includes("High") ? 75 : shouldWe.rating && shouldWe.rating.includes("Medium") ? 50 : 25;
-    const canWeValue = canWe.rating && (canWe.rating.includes("Yes") || canWe.rating.includes("High")) ? 75 : canWe.rating && (canWe.rating.includes("No") || canWe.rating.includes("Low")) ? 25 : 50;
+    const lens = data.decisionFrameworks.strategicLens;
 
     container.innerHTML = `
         <section class="chapter-header">
-            <p class="eyebrow">Decision Lens</p>
-            <h2 class="chapter-title">Strategy Matrix</h2>
-            <p class="chapter-summary">A 2x2 framework evaluating both strategic fit ("Should We?") and execution capability ("Can We?") to determine the optimal path forward.</p>
+            <p class="eyebrow">${I18n.t("nav.decision_lens")}</p>
+            <h2 class="chapter-title">${I18n.t("nav.strategy_matrix")}</h2>
         </section>
-
         <section class="content-block">
-            <h3>Can We / Should We Matrix</h3>
-            <div class="matrix-container">
-                <div class="matrix-grid-wrapper">
-                    <div class="matrix-axis-y"><span>Strategic Fit (Should We?)</span></div>
-                    <div class="matrix-2x2">
-                        <div class="quadrant top-left">
-                            <span class="quadrant-label">Strategy without Capability</span>
-                        </div>
-                        <div class="quadrant top-right">
-                            <span class="quadrant-label">Clear Winner</span>
-                        </div>
-                        <div class="quadrant bottom-left">
-                            <span class="quadrant-label">No Go</span>
-                        </div>
-                        <div class="quadrant bottom-right">
-                            <span class="quadrant-label">Execution without Strategy</span>
-                        </div>
-                        
-                        <!-- Dynamic Marker -->
-                        <div class="matrix-marker-dot" style="top: ${100 - shouldWeValue}%; left: ${canWeValue}%;">
-                            <div class="marker-label">You Are Here</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="matrix-axis-x"><span>Execution Capacity (Can We?)</span></div>
-            </div>
-        </section>
-
-        <section class="content-block">
-            <h3>Should We Do It?</h3>
-            <div class="strategy-rating-card">
-                <div class="strategy-rating-header">
-                    <span class="strategy-rating-badge">${shouldWe.rating || "N/A"}</span>
-                </div>
-                <p class="strategy-rationale">${shouldWe.rationale || ""}</p>
-                <div class="strategy-dimensions-grid">
-                    ${(shouldWe.dimensions || []).map(dim => `
-                        <div class="strategy-dimension">
-                            <div class="dimension-header">
-                                <span class="dimension-label">${dim.label}</span>
-                                <span class="dimension-value ${dim.value.toLowerCase()}">${dim.value}</span>
+            <div class="lens-grid">
+                <div class="lens-card">
+                    <h3 style="margin-bottom:1rem;">${I18n.t("matrix.should_we")}</h3>
+                    <p style="font-size:1.2rem; font-weight:700; margin-bottom:1rem;">${lens.shouldWe.rating}</p>
+                    <p style="margin-bottom:1.5rem; line-height:1.6; color:var(--text-secondary);">${lens.shouldWe.rationale}</p>
+                    ${lens.shouldWe.dimensions.map(dim => `
+                        <div style="padding:0.75rem 0; border-top:1px solid #eee;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+                                <strong>${dim.label}</strong>
+                                <span class="belief-status">${dim.value}</span>
                             </div>
-                            <p class="dimension-text">${dim.text}</p>
+                            <p style="font-size:0.9rem; color:#666;">${dim.text}</p>
                         </div>
                     `).join("")}
                 </div>
-            </div>
-        </section>
-
-        <section class="content-block">
-            <h3>Can We Do It?</h3>
-            <div class="strategy-rating-card">
-                <div class="strategy-rating-header">
-                    <span class="strategy-rating-badge">${canWe.rating || "N/A"}</span>
-                </div>
-                <p class="strategy-rationale">${canWe.rationale || ""}</p>
-                <div class="strategy-dimensions-grid">
-                    ${(canWe.dimensions || []).map(dim => `
-                        <div class="strategy-dimension">
-                            <div class="dimension-header">
-                                <span class="dimension-label">${dim.label}</span>
-                                <span class="dimension-value ${dim.value.toLowerCase()}">${dim.value}</span>
+                <div class="lens-card">
+                    <h3 style="margin-bottom:1rem;">${I18n.t("matrix.can_we")}</h3>
+                    <p style="font-size:1.2rem; font-weight:700; margin-bottom:1rem;">${lens.canWe.rating}</p>
+                    <p style="margin-bottom:1.5rem; line-height:1.6; color:var(--text-secondary);">${lens.canWe.rationale}</p>
+                    ${lens.canWe.dimensions.map(dim => `
+                        <div style="padding:0.75rem 0; border-top:1px solid #eee;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:0.25rem;">
+                                <strong>${dim.label}</strong>
+                                <span class="belief-status">${dim.value}</span>
                             </div>
-                            <p class="dimension-text">${dim.text}</p>
+                            <p style="font-size:0.9rem; color:#666;">${dim.text}</p>
                         </div>
                     `).join("")}
                 </div>
@@ -1103,27 +1060,11 @@ function renderDebateClub(data) {
 
     container.innerHTML = `
         <section class="chapter-header">
-            <p class="eyebrow">Decision Lens</p>
-            <h2 class="chapter-title">Debate Club</h2>
-            <p class="chapter-summary">A simulated dialogue between key stakeholders, capturing the real tensions and trade-offs in this decision. Each persona represents a different perspective on risk, opportunity, and execution.</p>
+            <p class="eyebrow">${I18n.t("nav.decision_lens")}</p>
+            <h2 class="chapter-title">${I18n.t("nav.debate_club")}</h2>
         </section>
-
-        <div class="debate-club-container">
-            <div class="debate-messages">
-                ${messages}
-            </div>
-            <div class="debate-input-area">
-                <div class="debate-input-wrapper">
-                    <input type="text" class="debate-input" placeholder="Add your perspective to the debate..." disabled>
-                    <button class="debate-send-btn" disabled>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                    </button>
-                </div>
-                <p class="debate-input-hint">This is a read-only view of the debate. Input functionality coming soon.</p>
-            </div>
+        <div class="debate-container">
+            ${messages}
         </div>
     `;
 }
@@ -1136,7 +1077,7 @@ function renderRiskMatrixSection(data) {
         .map(
             (risk) => `
             <div class="highlight-box danger">
-                <h4>${risk.title}</h4>
+                <h4 style="color: #991b1b; margin-bottom: 0.5rem;">${risk.title}</h4>
                 <p>${risk.detail}</p>
             </div>
         `
@@ -1145,19 +1086,17 @@ function renderRiskMatrixSection(data) {
 
     container.innerHTML = `
         <section class="chapter-header">
-            <p class="eyebrow">Risk Lens</p>
-            <h2 class="chapter-title">6T Risk Matrix</h2>
-            <p class="chapter-summary">${data.riskAnalysis.overall}</p>
+            <p class="eyebrow">${I18n.t("nav.risk")}</p>
+            <h2 class="chapter-title">${I18n.t("nav.six_t_risk")}</h2>
         </section>
+
         ${renderRiskMatrixCard(data.riskAnalysis, false)}
+        
         <section class="content-block">
-            <h3>Priority Items for the Next 90 Days</h3>
+            <h3>${I18n.t("exec.critical_risks")}</h3>
             ${topRisks}
         </section>
     `;
     
-    // Initialize the risk radar chart after DOM update
-    setTimeout(() => {
-        initRiskRadarChart(data.riskAnalysis.sixTs, 'riskRadarChartFull');
-    }, 50);
 }
+
