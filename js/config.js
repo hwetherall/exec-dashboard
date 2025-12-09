@@ -5,7 +5,7 @@
 
 const CONFIG = {
     // OpenRouter API Key
-    OPENROUTER_API_KEY: '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',
+    OPENROUTER_API_KEY: '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',
     
     // Available Models
     MODELS: [

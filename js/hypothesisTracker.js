@@ -4,11 +4,30 @@
  */
 
 const HypothesisTracker = (function() {
+    // Version for data migration - increment when hypothesis structure changes
+    const CURRENT_VERSION = '2.0';
+    
     // localStorage keys
     const STORAGE_KEYS = {
         hypotheses: 'kajima_hypotheses',
-        recommendation: 'kajima_recommendation'
+        recommendation: 'kajima_recommendation',
+        version: 'kajima_version'
     };
+    
+    /**
+     * Check version and clear old data if needed
+     */
+    function checkVersionAndMigrate() {
+        const storedVersion = localStorage.getItem(STORAGE_KEYS.version);
+        if (storedVersion !== CURRENT_VERSION) {
+            console.log(`Migrating from v${storedVersion || '1.x'} to v${CURRENT_VERSION}: Clearing old hypothesis data`);
+            localStorage.removeItem(STORAGE_KEYS.hypotheses);
+            localStorage.removeItem(STORAGE_KEYS.recommendation);
+            localStorage.setItem(STORAGE_KEYS.version, CURRENT_VERSION);
+            return true; // Migration occurred
+        }
+        return false;
+    }
 
     // Internal state
     let state = {
@@ -35,13 +54,15 @@ const HypothesisTracker = (function() {
         question: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
         warning: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
         arrowRight: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>`,
-        filter: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>`
+        filter: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon></svg>`,
+        target: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>`
     };
 
     /**
      * Initialize the tracker
      */
     function init() {
+        checkVersionAndMigrate();
         loadState();
     }
 
@@ -471,6 +492,18 @@ const HypothesisTracker = (function() {
                         <span class="validation-label">${I18n.t('tracker.validation')}:</span>
                         <p class="validation-text">${h.validationMethod || I18n.t('tracker.not_specified')}</p>
                     </div>
+                    ${h.successGate ? `
+                    <div class="gate-info success-gate">
+                        <span class="gate-label">✓ Success Gate:</span>
+                        <p class="gate-text">${h.successGate}</p>
+                    </div>
+                    ` : ''}
+                    ${h.failureAction ? `
+                    <div class="gate-info failure-action">
+                        <span class="gate-label">✗ If Failed:</span>
+                        <p class="gate-text">${h.failureAction}</p>
+                    </div>
+                    ` : ''}
                     <div class="source-info">
                         <span class="source-label">${I18n.t('tracker.source')}:</span>
                         <span class="source-text">${h.sourceSection || I18n.t('tracker.not_specified')}</span>

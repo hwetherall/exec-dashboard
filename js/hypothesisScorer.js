@@ -1,6 +1,7 @@
 /**
  * Hypothesis Scorer Module
  * Handles LLM integration for generating investment recommendations
+ * Version 2.0 - Updated for 6 core hypotheses
  */
 
 const HypothesisScorer = (function() {
@@ -30,8 +31,9 @@ const HypothesisScorer = (function() {
             const statusLabel = StatusConfig[h.status]?.label || h.status;
             const categoryLabel = CategoryConfig[h.category]?.label || h.category;
             
-            return `- [${outcomeLabel.toUpperCase()}] ${h.title}
+            return `- [${outcomeLabel.toUpperCase()}] ${h.id}: ${h.title}
   Category: ${categoryLabel} | Status: ${statusLabel}
+  Success Gate: ${h.successGate || 'Not specified'}
   ${h.notes ? `Notes: ${h.notes}` : 'No notes recorded'}`;
         }).join('\n\n');
     }
@@ -40,30 +42,40 @@ const HypothesisScorer = (function() {
      * Build the system prompt for the LLM
      */
     function buildSystemPrompt() {
-        return `You are an expert investment committee advisor. You are evaluating a corporate venture investment based on validated and invalidated hypotheses.
+        return `You are an expert investment committee advisor evaluating a corporate venture investment for Kajima's Wellbeing Real Estate Initiative.
 
-Your task is to provide an investment recommendation based on the current state of due diligence.
+Your task is to provide an investment recommendation based on the current state of hypothesis validation.
+
+CONTEXT:
+- This is a Pre-Commercial / Validation stage venture
+- The ask is ¥300M for Tranche 1 (90-day validation)
+- Three hypotheses are KILL CRITERIA (must pass for GO)
+- Three hypotheses are WEIGHTED (affect confidence but not fatal)
 
 CRITICAL RULES:
-1. If ANY hypothesis marked as "kill_criteria" (in the KILL CRITERIA section) has outcome "INVALIDATED", your verdict MUST be "NO_GO"
-2. If most kill_criteria are still "PENDING", recommend "CONTINUE_DD" regardless of weighted hypothesis results
-3. Consider the balance of validated vs invalidated weighted hypotheses
-4. Factor in which categories have the most uncertainty
-5. Be specific about what evidence drove your recommendation
+1. If ANY KILL CRITERIA hypothesis (H001-APPI, H002-WTP, H003-Costs) is INVALIDATED → verdict MUST be "NO_GO"
+2. If ALL KILL CRITERIA are VALIDATED and majority of WEIGHTED are positive → "GO"
+3. If KILL CRITERIA are still PENDING → "CONTINUE_DD" regardless of weighted results
+4. "PROCEED_WITH_CAUTION" only if KILL CRITERIA validated but WEIGHTED are mixed
 
-VERDICT OPTIONS (use exactly one):
-- GO: Sufficient evidence to proceed with investment
-- NO_GO: Evidence indicates this investment should not proceed
-- CONTINUE_DD: More due diligence needed before a decision can be made
-- PROCEED_WITH_CAUTION: Evidence is mixed but leans positive; proceed with specific risk mitigations
+KILL CRITERIA (H001, H002, H003):
+- H001: APPI Legal Viability - Can we legally collect biometric data?
+- H002: Commercial WTP - Will customers pay 5%+ premium?
+- H003: Installation Costs - Can we keep costs under ¥25M?
 
-Respond ONLY with valid JSON in this exact format (no markdown, no code blocks, just pure JSON):
+WEIGHTED FACTORS (H004, H005, H006):
+- H004: Team - Can we hire commercial leadership?
+- H005: Hardware Architecture - Can we avoid the "Hardware Trap"?
+- H006: WellnessGPT Accuracy - Is the science defensible?
+
+Respond ONLY with valid JSON in this exact format:
 {
   "verdict": "GO | NO_GO | CONTINUE_DD | PROCEED_WITH_CAUTION",
   "confidence": "HIGH | MEDIUM | LOW",
-  "reasoning": "2-4 sentence explanation of your recommendation, highlighting the most important factors",
+  "reasoning": "2-4 sentence explanation highlighting the key factors",
   "priorities": ["Top priority action 1", "Top priority action 2", "Top priority action 3"],
-  "concerns": ["Key concern 1", "Key concern 2"]
+  "concerns": ["Key concern 1", "Key concern 2"],
+  "tranche2_gate": "What must be true before releasing Tranche 2 funding"
 }`;
     }
 
@@ -128,6 +140,7 @@ Based on this evidence, what is your investment recommendation? Remember to resp
                 reasoning: parsed.reasoning || '',
                 priorities: Array.isArray(parsed.priorities) ? parsed.priorities : [],
                 concerns: Array.isArray(parsed.concerns) ? parsed.concerns : [],
+                tranche2_gate: parsed.tranche2_gate || '',
                 updatedAt: new Date().toISOString()
             };
         } catch (e) {
@@ -248,4 +261,3 @@ Based on this evidence, what is your investment recommendation? Remember to resp
 
 // Expose to window
 window.HypothesisScorer = HypothesisScorer;
-

@@ -1758,6 +1758,43 @@ body {
     color: var(--text-secondary);
 }
 
+/* Success Gate and Failure Action */
+.gate-info {
+    margin-top: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.gate-info.success-gate {
+    background: rgba(34, 197, 94, 0.08);
+    border-left: 3px solid var(--success-color);
+}
+
+.gate-info.failure-action {
+    background: rgba(239, 68, 68, 0.08);
+    border-left: 3px solid var(--danger-color);
+}
+
+.gate-label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.success-gate .gate-label {
+    color: var(--success-color);
+}
+
+.failure-action .gate-label {
+    color: var(--danger-color);
+}
+
+.gate-text {
+    margin: 0;
+    line-height: 1.5;
+}
+
 .card-footer {
     margin-top: 1.5rem;
     padding-top: 1rem;
@@ -2579,4 +2616,276 @@ body {
         grid-template-columns: 1fr;
         gap: 0.5rem;
     }
+}
+
+/* ═══════════════════════════════════════════════════════════════ */
+/* NEW STYLES: Action Plan, Beliefs, Placeholder Sections         */
+/* ═══════════════════════════════════════════════════════════════ */
+
+/* Action Plan Steps */
+.action-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.action-step {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.step-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    color: white;
+}
+
+.step-number {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+.step-title {
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.step-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.step-rationale {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.step-rationale strong {
+    color: var(--text-primary);
+}
+
+.step-activities {
+    font-size: 0.9rem;
+}
+
+.step-activities ul {
+    margin-top: 0.5rem;
+    padding-left: 1.5rem;
+}
+
+.step-activities li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+.step-gate {
+    padding: 1rem;
+    background: #f0fdf4;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #166534;
+    border-left: 3px solid var(--success-color);
+}
+
+.step-fallback {
+    padding: 1rem;
+    background: #fef2f2;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: #991b1b;
+    border-left: 3px solid var(--danger-color);
+}
+
+/* Beliefs List */
+.beliefs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.belief-item {
+    padding: 1rem 1.5rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.belief-status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    width: fit-content;
+}
+
+.belief-status-badge.status-unvalidated {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.belief-status-badge.status-high-risk {
+    background: #fef2f2;
+    color: #991b1b;
+}
+
+.belief-status-badge.status-in-lab {
+    background: #eff6ff;
+    color: #1e40af;
+}
+
+.belief-item p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text-primary);
+}
+
+/* Facts List */
+.facts-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.facts-list li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.facts-list li:last-child {
+    border-bottom: none;
+}
+
+.facts-list li::before {
+    content: "•";
+    color: var(--accent-color);
+    font-weight: bold;
+    position: absolute;
+    left: 0;
+}
+
+/* Placeholder Section */
+.placeholder-section {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-radius: 16px;
+    border: 2px dashed var(--border-color);
+}
+
+.placeholder-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+}
+
+.placeholder-section h3 {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+}
+
+.placeholder-section > p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    max-width: 500px;
+    margin: 0 auto 2rem auto;
+    line-height: 1.6;
+}
+
+.placeholder-features {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.placeholder-feature {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.25rem;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.placeholder-feature .feature-icon {
+    font-size: 1.25rem;
+}
+
+.placeholder-feature span:last-child {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+/* Highlight Box Variants */
+.highlight-box.info {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1e40af;
+}
+
+.highlight-box.success {
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+    color: #166534;
+}
+
+/* Large Gut Check Quote */
+.gut-check-quote.large {
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.gut-check-quote.large blockquote {
+    font-size: 1.1rem;
+    line-height: 1.7;
+}
+
+/* Section Subtitle */
+.section-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+/* Overview Table Specific */
+.overview-table .field-cell {
+    background: #f8fafc;
+    width: 30%;
+}
+
+.overview-table .value-cell {
+    font-size: 0.95rem;
 }

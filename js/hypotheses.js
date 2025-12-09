@@ -1,6 +1,7 @@
 /**
  * Hypothesis Data Model and Initial Data
- * Contains enums, data structures, and hardcoded hypotheses for the Hypothesis Tracker
+ * Based on: Wellbeing Real Estate Initiative Executive Summary - Next Steps and Action Plan
+ * Version 2.0 - Updated to 6 core hypotheses
  */
 
 // Hypothesis status enum
@@ -63,12 +64,19 @@ const OutcomeConfig = {
     [HypothesisOutcome.INCONCLUSIVE]: { label: 'Inconclusive', icon: '?', color: '#6b7280' }
 };
 
-// Initial hypotheses data - hardcoded from investment memo analysis
+// ═══════════════════════════════════════════════════════════════
+// INITIAL HYPOTHESES - Derived from Next Steps and Action Plan
+// Version 2.0: 6 Core Hypotheses (3 Kill Criteria + 3 Weighted)
+// ═══════════════════════════════════════════════════════════════
+
 const initialHypotheses = [
+    // ──────────────────────────────────────────────────────────────
+    // KILL CRITERIA (3 Critical Hypotheses - Must Pass for GO)
+    // ──────────────────────────────────────────────────────────────
     {
         id: "H001",
-        title: "Biometric data collection is legally viable under Japan's APPI",
-        description: "The collection of physiological and behavioral data via cameras and sensors can be conducted in corporate environments without triggering prohibitive consent requirements or liability under Japan's APPI.",
+        title: "APPI Regulatory Viability",
+        description: "The collection of biometric data in the workplace is legally permissible under APPI without requiring 100% individual opt-in. A formal legal opinion must confirm deployment is viable with <20% opt-out rate.",
         category: HypothesisCategory.REGULATORY,
         type: HypothesisType.KILL_CRITERIA,
         owner: "",
@@ -78,251 +86,117 @@ const initialHypotheses = [
         status: HypothesisStatus.NOT_STARTED,
         outcome: HypothesisOutcome.PENDING,
         notes: "",
-        sourceSection: "Legal and IP / Red Flags & Discrepancies",
-        validationMethod: "Commission formal legal opinion and Privacy Impact Assessment (PIA) regarding 'AI-Integrated Sensing' architecture.",
+        sourceSection: "Next Steps - Step 1",
+        validationMethod: "Commission formal legal opinion on specific sensor stack regarding workplace consent requirements. Draft 'Data Governance Charter' defining anonymization protocols. Confirm if 'Safe Harbor' exists for aggregated data.",
+        successGate: "Legal Clearance: Formal legal opinion confirms deployment viable with <20% opt-out rate.",
+        failureAction: "If blocked, pivot immediately to 'Option A: Design Focus' (remove sensors).",
         updatedAt: null
     },
     {
         id: "H002",
-        title: "Developers will pay a 4-8% CapEx premium for wellbeing integration",
-        description: "Commercial real estate developers are willing to pay an upfront construction premium for Kajima's proprietary hardware despite the split-incentive problem where tenants reap the benefits.",
+        title: "Commercial Willingness to Pay (WTP)",
+        description: "Corporate tenants will sign binding agreements at a 4.4–7.7% price premium for invisible physiological benefits, not just visible design features.",
         category: HypothesisCategory.FINANCIAL,
         type: HypothesisType.KILL_CRITERIA,
         owner: "",
-        suggestedOwner: "Sales",
+        suggestedOwner: "Sales / BD Team",
         dueDate: null,
         suggestedDueDays: 60,
         status: HypothesisStatus.NOT_STARTED,
         outcome: HypothesisOutcome.PENDING,
         notes: "",
-        sourceSection: "Revenue Model / Assumptions Validation Table",
-        validationMethod: "Secure at least one Letter of Intent (LOI) from a non-Kajima client explicitly accepting the premium pricing tier.",
+        sourceSection: "Next Steps - Step 2",
+        validationMethod: "Conduct deep-dive interviews with 10 corporate real estate directors. Pitch three distinct offer tiers (Design-only vs. Tech-enabled) to existing clients. Secure non-binding LOIs that explicitly itemize the technology premium.",
+        successGate: "Commercial Validation: Secure 3 signed LOIs with confirmed price premium of ≥5% over standard Grade-A rates.",
+        failureAction: "If customers refuse premiums, pivot to 'Option C: Consulting Services.'",
         updatedAt: null
     },
     {
         id: "H003",
-        title: "Environmental stimuli reliably cause physiological recovery",
-        description: "The proposed environmental interventions (lighting, sound, air) produce a statistically significant, causal improvement in physiological metrics (e.g., cortisol reduction) greater than placebo.",
-        category: HypothesisCategory.TECH,
-        type: HypothesisType.KILL_CRITERIA,
-        owner: "",
-        suggestedOwner: "Technical DD",
-        dueDate: null,
-        suggestedDueDays: 90,
-        status: HypothesisStatus.NOT_STARTED,
-        outcome: HypothesisOutcome.PENDING,
-        notes: "",
-        sourceSection: "Product and Technology / Claims Verification",
-        validationMethod: "Independent clinical review of ST3 R&D data and execution of a 'Wizard of Oz' test in the K/Park prototype.",
-        updatedAt: null
-    },
-    {
-        id: "H004",
-        title: "Freedom-to-Operate exists for proprietary hardware (Sound Aircon)",
-        description: "Kajima's proprietary hardware prototypes (Sound Aircon, Sky-apier) do not infringe on existing smart building patents held by incumbents like Daikin or Mitsubishi.",
-        category: HypothesisCategory.REGULATORY,
-        type: HypothesisType.KILL_CRITERIA,
-        owner: "",
-        suggestedOwner: "Legal Team",
-        dueDate: null,
-        suggestedDueDays: 30,
-        status: HypothesisStatus.NOT_STARTED,
-        outcome: HypothesisOutcome.PENDING,
-        notes: "",
-        sourceSection: "Legal and IP",
-        validationMethod: "External patent counsel FTO analysis specifically for 'Sound Aircon' and 'Sky-apier' configurations.",
-        updatedAt: null
-    },
-    {
-        id: "H005",
-        title: "Customers perceive value in proprietary 'Bio-Logic' over WELL certification",
-        description: "The market values Kajima's proprietary 'biological accountability' data enough to pay for it as a substitute for, or premium addition to, standard WELL certification.",
-        category: HypothesisCategory.COMPETITIVE,
-        type: HypothesisType.WEIGHTED,
-        owner: "",
-        suggestedOwner: "Sales",
-        dueDate: null,
-        suggestedDueDays: 60,
-        status: HypothesisStatus.NOT_STARTED,
-        outcome: HypothesisOutcome.PENDING,
-        notes: "",
-        sourceSection: "Revenue Validation Strategy",
-        validationMethod: "A/B testing in sales pitches: 'Performance Guarantee' vs. 'Standard Certification' to measure take-rate.",
-        updatedAt: null
-    },
-    {
-        id: "H006",
-        title: "Employees will opt-in to workplace biometric monitoring",
-        description: "Corporate employees are willing to accept AI camera tracking and physiological sensing in exchange for wellbeing benefits, with an opt-in rate sufficient for system viability (>40%).",
-        category: HypothesisCategory.MARKET,
-        type: HypothesisType.KILL_CRITERIA,
-        owner: "",
-        suggestedOwner: "Market Research",
-        dueDate: null,
-        suggestedDueDays: 60,
-        status: HypothesisStatus.NOT_STARTED,
-        outcome: HypothesisOutcome.PENDING,
-        notes: "",
-        sourceSection: "Claims Verification / Market Demand",
-        validationMethod: "Survey 20+ corporate tenant HR directors and employee representatives regarding surveillance acceptance.",
-        updatedAt: null
-    },
-    {
-        id: "H007",
-        title: "WellnessGPT creates defensible differentiation vs standard LLMs",
-        description: "Kajima's internal 'WellnessGPT' provides design insights or data correlations significantly superior to standard public LLMs (GPT-4) prompted with wellbeing context.",
-        category: HypothesisCategory.TECH,
-        type: HypothesisType.WEIGHTED,
-        owner: "",
-        suggestedOwner: "Technical DD",
-        dueDate: null,
-        suggestedDueDays: 30,
-        status: HypothesisStatus.NOT_STARTED,
-        outcome: HypothesisOutcome.PENDING,
-        notes: "",
-        sourceSection: "Competitive Analysis / Derisking Actions",
-        validationMethod: "Blind comparison test of WellnessGPT outputs vs. standard GPT-4 queries on wellbeing design scenarios.",
-        updatedAt: null
-    },
-    {
-        id: "H008",
-        title: "Integrated hardware offers ROI superior to software retrofits",
-        description: "The capital-intensive 'integrated build' delivers value outcomes (productivity/retention) significantly higher than low-cost software-only retrofits (e.g., BrainBox AI).",
-        category: HypothesisCategory.COMPETITIVE,
-        type: HypothesisType.WEIGHTED,
-        owner: "",
-        suggestedOwner: "Strategy",
-        dueDate: null,
-        suggestedDueDays: 60,
-        status: HypothesisStatus.NOT_STARTED,
-        outcome: HypothesisOutcome.PENDING,
-        notes: "",
-        sourceSection: "Competitive Analysis",
-        validationMethod: "Comparative ROI analysis of Kajima's prototype results vs. published case studies of software retrofit competitors.",
-        updatedAt: null
-    },
-    {
-        id: "H009",
-        title: "Recurring SaaS revenue model is viable for general contractors",
-        description: "Building owners are willing to pay ongoing subscription fees for data/monitoring services to a construction firm, validating the LTV assumptions.",
+        title: "Installation Unit Economics",
+        description: "Installation labor costs can be contained within ¥25 million per 10,000 sqm project. Current estimates vary from ¥15M (model) to ¥83M (time-motion analysis) - a 5.5x variance.",
         category: HypothesisCategory.FINANCIAL,
-        type: HypothesisType.WEIGHTED,
+        type: HypothesisType.KILL_CRITERIA,
         owner: "",
-        suggestedOwner: "Finance",
-        dueDate: null,
-        suggestedDueDays: 90,
-        status: HypothesisStatus.NOT_STARTED,
-        outcome: HypothesisOutcome.PENDING,
-        notes: "",
-        sourceSection: "Revenue Model / Unit Economics",
-        validationMethod: "Attempt to sell a standalone data subscription contract to an existing client (independent of new construction).",
-        updatedAt: null
-    },
-    {
-        id: "H010",
-        title: "Proprietary hardware can be decoupled to prevent obsolescence",
-        description: "The sensor and tech layer can be upgraded or replaced without prohibitive renovation costs, mitigating the 3-5 year tech vs. 50-year building lifecycle mismatch.",
-        category: HypothesisCategory.TECH,
-        type: HypothesisType.WEIGHTED,
-        owner: "",
-        suggestedOwner: "Technical DD",
-        dueDate: null,
-        suggestedDueDays: 60,
-        status: HypothesisStatus.NOT_STARTED,
-        outcome: HypothesisOutcome.PENDING,
-        notes: "",
-        sourceSection: "Product and Technology / Technical Risks",
-        validationMethod: "Technical architecture review to confirm 'Layered Architecture' feasibility (surface mounting vs. embedded).",
-        updatedAt: null
-    },
-    {
-        id: "H011",
-        title: "Internal construction teams will not value-engineer tech out",
-        description: "Core construction division leadership will support the inclusion of higher-cost wellbeing specs rather than cutting them to protect standard project margins.",
-        category: HypothesisCategory.TEAM,
-        type: HypothesisType.WEIGHTED,
-        owner: "",
-        suggestedOwner: "Internal Audit",
-        dueDate: null,
-        suggestedDueDays: 30,
-        status: HypothesisStatus.NOT_STARTED,
-        outcome: HypothesisOutcome.PENDING,
-        notes: "",
-        sourceSection: "GTM and Partners / Stakeholder Engagement",
-        validationMethod: "Establish a 'Pilot-to-Standard' review process and interview Project Managers regarding margin incentives.",
-        updatedAt: null
-    },
-    {
-        id: "H012",
-        title: "Kajima can attract necessary medical and digital leadership",
-        description: "The organization can implement a compensation and culture structure capable of hiring a Chief Medical Officer and Head of Product.",
-        category: HypothesisCategory.TEAM,
-        type: HypothesisType.WEIGHTED,
-        owner: "",
-        suggestedOwner: "HR/Recruiting",
-        dueDate: null,
-        suggestedDueDays: 60,
-        status: HypothesisStatus.NOT_STARTED,
-        outcome: HypothesisOutcome.PENDING,
-        notes: "",
-        sourceSection: "Team and Execution",
-        validationMethod: "Test market reaction to job requisitions for these roles; review HR policy on non-standard compensation bands.",
-        updatedAt: null
-    },
-    {
-        id: "H013",
-        title: "Technology Curator strategy avoids vendor lock-in",
-        description: "The platform can successfully integrate third-party sensors (e.g., Honeywell) without creating data silos or dependency that blocks the 'WellnessGPT' logic.",
-        category: HypothesisCategory.TECH,
-        type: HypothesisType.WEIGHTED,
-        owner: "",
-        suggestedOwner: "Technical DD",
+        suggestedOwner: "Operations / Finance",
         dueDate: null,
         suggestedDueDays: 45,
         status: HypothesisStatus.NOT_STARTED,
         outcome: HypothesisOutcome.PENDING,
         notes: "",
-        sourceSection: "GTM and Partners / Partnership Strategy",
-        validationMethod: "Review API documentation and data ownership clauses in potential vendor contracts.",
+        sourceSection: "Next Steps - Step 3",
+        validationMethod: "Execute limited 'Retrofit Pilot' in existing Kajima facility to measure actual installation labor hours. Audit 'Technology Curator' supply chain to lock in hardware pricing with vendors (Omron, Honeywell). Update financial model with verified data.",
+        successGate: "Economic Viability: Verified installation cost ≤¥25M per 10,000 sqm project.",
+        failureAction: "If costs >¥50M, pause scaling until value engineering reduces labor intensity.",
         updatedAt: null
     },
+
+    // ──────────────────────────────────────────────────────────────
+    // WEIGHTED HYPOTHESES (3 Supporting Hypotheses - Affect Confidence)
+    // ──────────────────────────────────────────────────────────────
     {
-        id: "H014",
-        title: "Gross margins can exceed standard construction levels (>15%)",
-        description: "The blend of hardware premium and services will result in blended gross margins significantly higher than the standard ~15% construction margin.",
-        category: HypothesisCategory.FINANCIAL,
+        id: "H004",
+        title: "Commercial Leadership Appointment",
+        description: "The organization can recruit and empower a Venture Lead with P&L authority and a Product Manager with B2B SaaS experience within 30 days.",
+        category: HypothesisCategory.TEAM,
         type: HypothesisType.WEIGHTED,
         owner: "",
-        suggestedOwner: "Finance",
+        suggestedOwner: "HR / Executive Team",
         dueDate: null,
-        suggestedDueDays: 90,
+        suggestedDueDays: 30,
         status: HypothesisStatus.NOT_STARTED,
         outcome: HypothesisOutcome.PENDING,
         notes: "",
-        sourceSection: "Unit Economics",
-        validationMethod: "Build a 'Bottom-Up' COGS model for a hypothetical project using validated vendor quotes and labor estimates.",
+        sourceSection: "Next Steps - Step 4",
+        validationMethod: "Hire or appoint 'Venture Lead' with P&L authority distinct from construction division. Recruit Product Manager with B2B SaaS experience. Establish 'Wellbeing Business Promotion Office' (WBPO) governance structure.",
+        successGate: "Team Readiness: Key commercial roles filled within 30 days.",
+        failureAction: "Do not release Tranche 2 funding (¥700M) until commercial leadership is in place.",
         updatedAt: null
     },
     {
-        id: "H015",
-        title: "Privacy by Design (Edge Processing) satisfies corporate security",
-        description: "Processing biometric data at the edge (on-device) rather than the cloud is sufficient to satisfy the security requirements of Tier 1 corporate tenant IT departments.",
+        id: "H005",
+        title: "Hardware Architecture Decoupling",
+        description: "The sensor and tech layer can be designed as FF&E (Furniture, Fixtures, Equipment) allowing 100% replacement without demolition, mitigating the 3-5 year tech vs. 50-year building lifecycle mismatch.",
         category: HypothesisCategory.TECH,
         type: HypothesisType.WEIGHTED,
         owner: "",
-        suggestedOwner: "Technical DD",
+        suggestedOwner: "Technical / R&D Team",
         dueDate: null,
         suggestedDueDays: 60,
         status: HypothesisStatus.NOT_STARTED,
         outcome: HypothesisOutcome.PENDING,
         notes: "",
-        sourceSection: "Technical Validation Strategy",
-        validationMethod: "Security architecture review with a sample Client CISO or third-party security auditor.",
+        sourceSection: "Next Steps - Step 5",
+        validationMethod: "Finalize 'Skin and Skeleton' technical specification where sensors are treated as FF&E. Redesign ceiling/wall integration to allow sensor replacement without demolition. Secure API stability guarantees from key hardware partners.",
+        successGate: "Technical Feasibility: Engineering approval of modular architecture allowing 100% sensor replacement in <48 hours per floor.",
+        failureAction: "If not achievable, building becomes 'Hardware Trap' liability.",
+        updatedAt: null
+    },
+    {
+        id: "H006",
+        title: "WellnessGPT Accuracy Verification",
+        description: "The proprietary 'WellnessGPT' ontology achieves >85% correlation with clinical-grade medical devices and >90% alignment with medical consensus.",
+        category: HypothesisCategory.TECH,
+        type: HypothesisType.WEIGHTED,
+        owner: "",
+        suggestedOwner: "Technical DD / Medical Advisor",
+        dueDate: null,
+        suggestedDueDays: 45,
+        status: HypothesisStatus.NOT_STARTED,
+        outcome: HypothesisOutcome.PENDING,
+        notes: "",
+        sourceSection: "Next Steps - Step 6",
+        validationMethod: "Conduct external audit of 100 random WellnessGPT recommendations against medical literature (PubMed). Benchmark sensor accuracy against clinical-grade devices in controlled lab test.",
+        successGate: "Data Integrity: >90% alignment with medical consensus and >85% correlation with clinical sensors.",
+        failureAction: "If accuracy is low, restrict claims to 'comfort' rather than 'health.'",
         updatedAt: null
     }
 ];
 
-// Utility functions
+// ═══════════════════════════════════════════════════════════════
+// UTILITY FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+
 function getHypothesisById(hypotheses, id) {
     return hypotheses.find(h => h.id === id);
 }
@@ -364,7 +238,10 @@ function getUniqueOwners(hypotheses) {
     return [...new Set(owners)].sort();
 }
 
-// Export to window for global access
+// ═══════════════════════════════════════════════════════════════
+// EXPORT TO GLOBAL SCOPE
+// ═══════════════════════════════════════════════════════════════
+
 window.HypothesisStatus = HypothesisStatus;
 window.HypothesisOutcome = HypothesisOutcome;
 window.HypothesisCategory = HypothesisCategory;
@@ -381,4 +258,3 @@ window.getHypothesesByOutcome = getHypothesesByOutcome;
 window.countByOutcome = countByOutcome;
 window.getAssessedCount = getAssessedCount;
 window.getUniqueOwners = getUniqueOwners;
-
