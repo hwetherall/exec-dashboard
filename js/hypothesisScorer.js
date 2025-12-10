@@ -8,12 +8,22 @@ const HypothesisScorer = (function() {
     // Configuration
     const CONFIG = {
         apiEndpoint: 'https://openrouter.ai/api/v1/chat/completions',
-        model: 'x-ai/grok-4.1-fast:free',
         debounceMs: 2000
     };
 
+    /**
+     * Get the model to use (dynamic, reads from config at runtime)
+     */
+    function getModel() {
+        return window.APP_CONFIG?.getDefaultModel()?.id || 'meta-llama/llama-4-maverick';
+    }
+
     // Internal state
     let debounceTimer = null;
+
+    function isAIEnabled() {
+        return window.APP_CONFIG?.ENABLE_AI_RECOMMENDATIONS !== false;
+    }
 
     /**
      * Get API key from config
@@ -153,6 +163,12 @@ Based on this evidence, what is your investment recommendation? Remember to resp
      * Generate recommendation via OpenRouter API
      */
     async function generateRecommendation(hypotheses) {
+        if (!isAIEnabled()) {
+            console.info('AI recommendations disabled; skipping AI call.');
+            HypothesisTracker.hideLoading();
+            return;
+        }
+
         const apiKey = getApiKey();
         
         if (!apiKey) {
@@ -172,7 +188,7 @@ Based on this evidence, what is your investment recommendation? Remember to resp
                     'X-Title': 'Investment Memo Dashboard - Hypothesis Tracker'
                 },
                 body: JSON.stringify({
-                    model: CONFIG.model,
+                    model: getModel(),
                     messages: [
                         { role: 'system', content: buildSystemPrompt() },
                         { role: 'user', content: buildUserPrompt(hypotheses) }
@@ -227,6 +243,10 @@ Based on this evidence, what is your investment recommendation? Remember to resp
      * Trigger auto-refresh with debouncing
      */
     function triggerAutoRefresh() {
+        if (!isAIEnabled()) {
+            return;
+        }
+
         // Clear existing timer
         if (debounceTimer) {
             clearTimeout(debounceTimer);
@@ -251,11 +271,24 @@ Based on this evidence, what is your investment recommendation? Remember to resp
         }
     }
 
+    /**
+     * Manual refresh wrapper - gets current state and generates recommendation
+     */
+    function manualRefresh() {
+        const state = window.HypothesisTracker?.getState();
+        if (state && state.hypotheses) {
+            generateRecommendation(state.hypotheses);
+        } else {
+            console.error('Cannot refresh: HypothesisTracker state not available');
+        }
+    }
+
     // Public API
     return {
         generateRecommendation,
         triggerAutoRefresh,
-        cancelAutoRefresh
+        cancelAutoRefresh,
+        manualRefresh
     };
 })();
 

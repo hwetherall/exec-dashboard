@@ -15,23 +15,23 @@ const CONFIG = {
     // Available Models
     MODELS: [
         {
-            id: 'x-ai/grok-4.1-fast:free',
-            name: 'Grok 4.1 Fast',
-            context: '2M',
-            description: 'Fast and free model',
+            id: 'google/gemini-2.0-flash-001',
+            name: 'Gemini 2.0 Flash',
+            context: '1M',
+            description: 'Fast model with large context window',
             isDefault: true
         },
         {
-            id: 'google/gemini-3-pro-preview',
-            name: 'Gemini 3 Pro Preview',
-            context: '1M',
-            description: 'Large context window'
+            id: 'anthropic/claude-3.5-sonnet',
+            name: 'Claude 3.5 Sonnet',
+            context: '200K',
+            description: 'High quality reasoning'
         },
         {
-            id: 'anthropic/claude-sonnet-4',
-            name: 'Claude Sonnet 4',
-            context: '200K',
-            description: 'High quality reasoning model'
+            id: 'openai/gpt-4o-mini',
+            name: 'GPT-4o Mini',
+            context: '128K',
+            description: 'Fast and affordable'
         }
     ],
     

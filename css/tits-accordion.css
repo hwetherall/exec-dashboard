@@ -1,0 +1,257 @@
+/* Tell It To Me Straight Accordion Styles */
+.tits-accordion {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: white;
+    overflow: hidden;
+    margin-top: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.tits-accordion-item {
+    border-bottom: 1px solid var(--border-color);
+}
+
+.tits-accordion-item:last-child {
+    border-bottom: none;
+}
+
+.tits-accordion-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    background: #fff;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.tits-accordion-header:hover {
+    background: #f8fafc;
+}
+
+.tits-accordion-header.active {
+    background: #f0f9ff;
+    color: #0284c7;
+}
+
+.tits-accordion-content {
+    padding: 2rem;
+    background: white;
+    border-top: 1px solid var(--border-color);
+}
+
+.tits-accordion-icon {
+    transition: transform 0.3s ease;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+}
+
+.tits-accordion-header.active .tits-accordion-icon {
+    transform: rotate(180deg);
+    color: #0284c7;
+}
+
+/* Overview Card Styles - Unified Look */
+.tits-overview-card {
+    background: #fff;
+    border-radius: 8px;
+}
+
+.tits-overview-header {
+    margin-bottom: 2rem;
+    padding-left: 1rem;
+    border-left: 4px solid var(--primary-color, #0f172a);
+}
+
+.tits-quote {
+    font-family: var(--font-heading, serif);
+    font-size: 1.25rem;
+    font-style: italic;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+.tits-source {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.tits-overview-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+@media (max-width: 768px) {
+    .tits-overview-body {
+        grid-template-columns: 1fr;
+    }
+}
+
+.tits-body-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.tits-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.tits-body-section.issue .tits-label {
+    color: #b45309; /* Amber/Orange for warning/issue */
+}
+
+.tits-body-section.verdict .tits-label {
+    color: #15803d; /* Green for verdict/action */
+}
+
+.tits-text {
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-primary);
+}
+
+.tits-text.bold {
+    font-weight: 600;
+}
+
+.tits-overview-footer {
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--border-color);
+}
+
+/* Enhancements for content inside accordion */
+.tits-accordion-content .corp-quote-box {
+    margin-top: 0;
+}
+
+/* Checklist Styles */
+.tits-checklist-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.tits-checklist-header-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 1rem 0.75rem 3.5rem; /* Indent to align with text, accounting for dot */
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    font-weight: 700;
+}
+
+.tits-checklist-item {
+    display: flex;
+    align-items: flex-start; /* Align top for multi-line text */
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color 0.2s ease;
+}
+
+.tits-checklist-item:last-child {
+    border-bottom: none;
+}
+
+.tits-checklist-item:hover {
+    background-color: #f8fafc;
+}
+
+.tits-checklist-status-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-top: 0.4rem; /* Visual alignment with text line-height */
+    margin-right: 1.5rem;
+    flex-shrink: 0;
+}
+
+.tits-checklist-status-indicator.danger { background-color: #ef4444; box-shadow: 0 0 0 2px #fee2e2; }
+.tits-checklist-status-indicator.warning { background-color: #f59e0b; box-shadow: 0 0 0 2px #fef3c7; }
+.tits-checklist-status-indicator.success { background-color: #22c55e; box-shadow: 0 0 0 2px #dcfce7; }
+.tits-checklist-status-indicator.neutral { background-color: #cbd5e1; box-shadow: 0 0 0 2px #f1f5f9; }
+
+.tits-checklist-content {
+    flex: 1;
+    padding-right: 2rem;
+}
+
+.tits-checklist-text {
+    font-family: var(--font-body, sans-serif);
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+.tits-checklist-meta {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.tits-status-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+}
+
+.tits-status-badge.danger {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.tits-status-badge.warning {
+    background-color: #fffbeb;
+    color: #92400e;
+    border: 1px solid #fde68a;
+}
+
+.tits-status-badge.success {
+    background-color: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.tits-status-badge.neutral {
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}

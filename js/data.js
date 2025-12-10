@@ -60,59 +60,94 @@ const memoData = {
     ],
 
     // ═══════════════════════════════════════════════════════════════
-    // BELIEF CHECKLIST (Key Assumptions to Validate)
+    // BELIEF CHECKLIST (Key Assumptions to Validate) - Aligned with 8 Hypotheses
     // ═══════════════════════════════════════════════════════════════
     beliefChecklist: [
         {
             id: "B1",
-            belief: "Corporate tenants will sign binding agreements at a 4.4–7.7% price premium for invisible physiological benefits.",
-            status: "unvalidated"
+            belief: "Biometric data collection is legally permissible under APPI without requiring 100% individual opt-in.",
+            hypothesisId: "H001",
+            status: "high_risk"
         },
         {
             id: "B2",
-            belief: "Biometric data collection is legally permissible under APPI without requiring 100% individual opt-in.",
-            status: "high_risk"
+            belief: "Corporate tenants will sign binding agreements at a 4.4–7.7% price premium for invisible physiological benefits.",
+            hypothesisId: "H002",
+            status: "unvalidated"
         },
         {
             id: "B3",
             belief: "Installation labor costs can be contained within ¥25M per 10,000 sqm project.",
+            hypothesisId: "H003",
             status: "unvalidated"
         },
         {
             id: "B4",
-            belief: "The 'Hardware Trap' can be mitigated via a 'skin-and-skeleton' architecture that decouples sensor lifecycles from building lifecycles.",
+            belief: "The organization can recruit and empower commercial leadership (Venture Lead + Product Manager) within 30 days.",
+            hypothesisId: "H004",
             status: "assumption"
         },
         {
             id: "B5",
+            belief: "The 'Hardware Trap' can be mitigated via a 'skin-and-skeleton' architecture that decouples sensor lifecycles from building lifecycles.",
+            hypothesisId: "H005",
+            status: "assumption"
+        },
+        {
+            id: "B6",
             belief: "The proprietary 'WellnessGPT' ontology achieves >85% correlation with clinical-grade medical devices.",
+            hypothesisId: "H006",
             status: "in_lab"
+        },
+        {
+            id: "B7",
+            belief: "The venture can deploy workplace monitoring technology without infringing existing patents in the crowded IP landscape.",
+            hypothesisId: "H007",
+            status: "unvalidated"
+        },
+        {
+            id: "B8",
+            belief: "The organization can establish a consultative sales channel capable of selling to CHROs and CFOs (not just facility managers).",
+            hypothesisId: "H008",
+            status: "assumption"
         }
     ],
 
     // ═══════════════════════════════════════════════════════════════
-    // NEXT STEPS / HYPOTHESES TO VALIDATE
+    // NEXT STEPS / HYPOTHESES TO VALIDATE (8 Core Hypotheses)
     // ═══════════════════════════════════════════════════════════════
     nextSteps: [
         {
-            hypothesis: "Premium Pricing",
-            action: "Secure 3 non-binding Letters of Intent (LOIs) that explicitly itemize the technology premium."
-        },
-        {
-            hypothesis: "Legal Viability",
+            hypothesis: "APPI Regulatory Viability",
             action: "Commission a formal legal opinion on the specific sensor stack regarding workplace consent requirements and 'Safe Harbor' provisions."
         },
         {
-            hypothesis: "Installation Costs",
-            action: "Execute a limited 'Retrofit Pilot' in an existing facility to measure actual installation labor hours."
+            hypothesis: "Commercial Willingness to Pay",
+            action: "Secure 3 signed LOIs with confirmed price premium of ≥5% over standard Grade-A rates through direct interviews with corporate real estate directors."
+        },
+        {
+            hypothesis: "Installation Unit Economics",
+            action: "Execute a limited 'Retrofit Pilot' in an existing facility to measure actual installation labor hours and validate ≤¥25M cost target."
+        },
+        {
+            hypothesis: "Commercial Leadership",
+            action: "Hire a Venture Lead with P&L authority and a Product Manager with B2B SaaS experience within 30 days."
         },
         {
             hypothesis: "Hardware Architecture",
-            action: "Finalize a technical specification where sensors are treated as FF&E to allow replacement without demolition."
+            action: "Finalize a 'Skin and Skeleton' technical specification where sensors are treated as FF&E allowing 100% replacement in <48 hours per floor."
         },
         {
             hypothesis: "WellnessGPT Accuracy",
-            action: "Conduct an external audit of 100 random WellnessGPT recommendations against medical literature."
+            action: "Conduct an external audit of 100 random WellnessGPT recommendations against medical literature (PubMed) and benchmark against clinical-grade devices."
+        },
+        {
+            hypothesis: "Freedom-to-Operate",
+            action: "Commission comprehensive FTO patent search covering workplace monitoring and biometric sensing IP landscape."
+        },
+        {
+            hypothesis: "Sales Channel Capability",
+            action: "Establish consultative sales overlay capable of selling to CHROs and CFOs, and pilot with 5 target accounts."
         }
     ],
 
@@ -436,13 +471,225 @@ const memoData = {
     ],
 
     // ═══════════════════════════════════════════════════════════════
-    // INVESTMENT COMMITTEE (Placeholder)
+    // INVESTMENT COMMITTEE - "What We Need to Believe"
     // ═══════════════════════════════════════════════════════════════
     investmentCommittee: {
         title: "Investment Committee",
-        subtitle: "What Would We Have to Believe?",
-        beliefs: [], // To be populated
-        placeholder: true
+        subtitle: "What We Need to Believe",
+        
+        executiveSummary: "To invest in the Kajima Wellbeing Real Estate Initiative, we must bridge the gap between Kajima's current reality as a low-margin General Contractor and a future state as a high-margin \"Wellbeing-as-a-Service\" provider. This requires us to accept three fundamental truths: that Japanese corporate tenants will pay a quantifiable premium for \"invisible\" physiological benefits; that strict APPI privacy laws permit the granular biometric tracking required for the value proposition; and that we can successfully decouple 3-year sensor lifecycles from 50-year building structures without creating a maintenance nightmare.",
+        
+        beliefs: [
+            {
+                id: "B001",
+                title: "The \"Invisible Value\" Premium",
+                shortStatement: "Tenants will pay ~4-7% CapEx premium + subscription fees for invisible physiological benefits.",
+                difficulty: "High",
+                linkedHypothesis: "H002",
+                tension: "The Bull argues that the post-pandemic shift in corporate priorities (ESG, employee retention) makes wellbeing a \"must-have,\" justifying a 4.4–7.7% premium. The Bear argues that without hard ROI data, this is a discretionary expense that will be value-engineered out of the budget the moment the economy softens.",
+                
+                bullCase: {
+                    argument: "The \"War for Talent\" and ESG mandates force companies to invest in human capital optimization. The post-pandemic war for talent has shifted the P&L priorities of every major corporation in Tokyo.",
+                    strength: "medium"
+                },
+                bearCase: {
+                    argument: "In a downturn, \"wellness\" is a \"nice-to-have\" amenity that CFOs cut immediately. No signed LOIs exist. We are modeling revenue on hope.",
+                    strength: "strong"
+                },
+                
+                verdict: {
+                    winner: "Bear",
+                    ruling: "The Bear wins on the current evidence. While the narrative of wellbeing is strong, the economics are unproven in the Japanese market. We are asking Kajima to bet capital on a hypothesis that tenants will pay upfront for benefits that are difficult to quantify. Until we see a tenant sign a check specifically for this feature—distinct from standard Grade-A fit-outs—we are modeling revenue on hope. The \"human capital\" argument is compelling to HR Directors, but CFOs sign the leases."
+                },
+                
+                killSwitch: {
+                    test: "One signed Letter of Intent (LOI) or a pilot contract where tenant explicitly agrees to projected subscription fee and CapEx premium, separated from standard rent.",
+                    linkedHypothesis: "H002"
+                }
+            },
+            {
+                id: "B002",
+                title: "Privacy Viability (APPI)",
+                shortStatement: "Biometric sensing is legal without individual consent under APPI.",
+                difficulty: "High",
+                linkedHypothesis: "H001",
+                tension: "The Bull believes that by aggregating data, Kajima can sidestep strict privacy laws. The Bear argues that under Japan's APPI, the collection mechanism itself (biometric sensing) triggers \"special care-required\" classifications, making the system legally undeployable without impossible-to-manage individual consent forms.",
+                
+                bullCase: {
+                    argument: "\"Privacy by Design\" (aggregation/anonymization) bypasses the need for individual waivers. If we implement strict edge processing where only anonymized trends are sent to the cloud, we bypass consent requirements entirely.",
+                    strength: "medium"
+                },
+                bearCase: {
+                    argument: "Biometrics are \"special care-required\" under APPI. One lawsuit or refusal kills the feedback loop. \"Trust\" and \"Privacy by Design\" are marketing terms, not legal defenses.",
+                    strength: "strong"
+                },
+                
+                verdict: {
+                    winner: "Bear",
+                    ruling: "This is a binary risk. If the Bear is right, the product is illegal in its current form. We cannot invest in a technology stack that might be rendered obsolete by a single interpretation of the APPI. We are currently operating in a \"gray zone,\" and for a conservative entity like Kajima, that is unacceptable."
+                },
+                
+                killSwitch: {
+                    test: "A formal written opinion from a Tier-1 Japanese law firm confirming that the specific hardware/software architecture does not require individual consent from building occupants under the latest APPI amendments.",
+                    linkedHypothesis: "H001"
+                }
+            },
+            {
+                id: "B003",
+                title: "Hardware-Lifecycle Decoupling",
+                shortStatement: "We can swap sensors easily (iPhone model for buildings).",
+                difficulty: "Medium",
+                linkedHypothesis: "H005",
+                tension: "The Bull sees the mismatch between sensor life (3 years) and building life (50 years) as a recurring revenue opportunity (the \"Technology Curator\" model). The Bear sees it as a liability trap, where Kajima becomes responsible for maintaining obsolete tech, and the labor cost of physical upgrades destroys the margin.",
+                
+                bullCase: {
+                    argument: "Creates a recurring revenue engine for upgrades (\"Technology Curator\"). By decoupling the \"skin\" (sensors) from the \"skeleton\" (structure), we create an \"iPhone model\" for real estate.",
+                    strength: "medium"
+                },
+                bearCase: {
+                    argument: "Integration costs and labor for swapping sensors eat the margins; buildings fill with \"tech rot.\" The \"iPhone model\" works because you replace the whole phone. Replacing sensors embedded in ceilings involves ladders, off-hours labor, and dust.",
+                    strength: "medium"
+                },
+                
+                verdict: {
+                    winner: "Bull",
+                    ruling: "The Bull's logic is sound strategically but weak operationally. The \"iPhone model\" works because you replace the whole phone. Replacing sensors embedded in ceilings involves ladders, off-hours labor, and dust. If the physical \"swap cost\" is high, the recurring revenue model fails because the margins are eaten by facility management labor. We need proof that the \"skin\" can actually be peeled off the \"skeleton\" cheaply."
+                },
+                
+                killSwitch: {
+                    test: "A physical \"Time-and-Motion\" study on a prototype ceiling grid demonstrating that a sensor upgrade can be performed in under 15 minutes per unit using standard tools, without specialized labor or significant disruption.",
+                    linkedHypothesis: "H005"
+                }
+            },
+            {
+                id: "B004",
+                title: "Causal Attribution",
+                shortStatement: "We can prove the building caused the stress reduction.",
+                difficulty: "Medium",
+                linkedHypothesis: "H006",
+                tension: "The Bull argues that aggregate statistical significance is sufficient to prove value to tenants. The Bear argues there is too much noise (personal life vs. office) and if the data is fuzzy, the ROI argument collapses.",
+                
+                bullCase: {
+                    argument: "Aggregate statistical significance is sufficient to prove value to tenants. With enough data volume, we can filter out the noise of personal stress to identify environmental patterns.",
+                    strength: "medium"
+                },
+                bearCase: {
+                    argument: "Too much noise (personal life vs. office). If the data is fuzzy, the ROI argument collapses. If the system triggers interventions that annoy tenants, they will ask us to turn it off.",
+                    strength: "medium"
+                },
+                
+                verdict: {
+                    winner: "Draw",
+                    ruling: "Both sides have merit. The concern is the \"false positive\" feedback loop—if the system triggers an intervention that annoys the tenants, they will ask us to turn it off, and once it's off, they stop paying the subscription. We need to test the \"annoyance threshold\" in a real office. If the automation isn't invisible and perfect, facility managers will override it manually, and our value proposition collapses to zero."
+                },
+                
+                killSwitch: {
+                    test: "External audit of 100 random WellnessGPT recommendations against medical literature showing >90% alignment with medical consensus and >85% correlation with clinical sensors.",
+                    linkedHypothesis: "H006"
+                }
+            }
+        ],
+        
+        debateTranscript: [
+            {
+                section: "Belief 1: The \"Invisible Value\" Premium",
+                exchanges: [
+                    {
+                        speaker: "Bear",
+                        role: "Risk Analyst",
+                        avatar: "bear",
+                        text: "I've reviewed the comps, and frankly, a 4.4–7.7% CapEx premium plus a ¥15M annual subscription is a fantasy for unproven tech. In a downturn, \"wellness\" is the first line item a CFO cuts; without signed LOIs or a single tenant contract confirming this willingness to pay, we are modeling our entire LTV on a hypothesis that historically trends toward zero. We are risking margin dilution on a \"nice-to-have\" amenity that the market will likely value at zero."
+                    },
+                    {
+                        speaker: "Bull",
+                        role: "Strategy Lead",
+                        avatar: "bull",
+                        text: "You're looking at historical construction data, not the future of the workplace; the post-pandemic war for talent has shifted the P&L priorities of every major corporation in Tokyo. If we can prove—even directionally—that this reduces attrition or sick days by 1%, that subscription fee is a rounding error compared to their recruiting costs. We aren't selling a building; we are selling human capital optimization, and the early movers in ESG real estate are already commanding double-digit rent premiums globally."
+                    },
+                    {
+                        speaker: "Operator",
+                        role: "Commercial Lead",
+                        avatar: "operator",
+                        text: "The theory is fine, but my sales team can't deposit \"human capital optimization\" in the bank; they need hard data to close that premium today. Unless we have a pilot that proves the ROI within a 12-month lease cycle, tenants will treat this as standard TI (Tenant Improvement) and refuse the subscription. We need to validate the willingness-to-pay with a retrofit pilot before we commit to this pricing model for new builds."
+                    }
+                ]
+            },
+            {
+                section: "Belief 2: Regulatory Permissibility (APPI)",
+                exchanges: [
+                    {
+                        speaker: "Bear",
+                        role: "Risk Analyst",
+                        avatar: "bear",
+                        text: "This is the kill switch; under Japan's APPI, biometric data is likely \"special care-required personal information,\" meaning we need explicit, individual consent from every single employee entering the building. One lawsuit, one data leak, or one disgruntled tenant refusing to sign waivers, and the entire \"active sensing\" feedback loop goes dark. We are betting the business model on a legal gray area that is trending toward stricter, not looser, privacy controls."
+                    },
+                    {
+                        speaker: "Bull",
+                        role: "Strategy Lead",
+                        avatar: "bull",
+                        text: "We are over-indexing on fear; the consumer market has already normalized biometric tracking via Apple Watches and Oura rings. If we implement a strict \"Privacy by Design\" architecture where data is processed at the edge and only aggregate, anonymized trends are sent to the cloud, we bypass the need for individual waivers entirely. This isn't a bug, it's a feature—Kajima becomes the trusted, secure broker of wellness data in a way Google or Amazon never can."
+                    },
+                    {
+                        speaker: "Operator",
+                        role: "Commercial Lead",
+                        avatar: "operator",
+                        text: "Trust doesn't solve the logistics of consent management for 5,000 employees and daily visitors. Even if legal gives us a yellow light, the operational friction of managing opt-outs and data purging requests could overwhelm our facility management teams. I need a formal legal opinion confirming that our specific hardware architecture complies without requiring a signature from every person who walks through the door."
+                    }
+                ]
+            },
+            {
+                section: "Belief 3: The \"Hardware Trap\" Solution",
+                exchanges: [
+                    {
+                        speaker: "Bear",
+                        role: "Risk Analyst",
+                        avatar: "bear",
+                        text: "We build assets that last 50 years; these sensors last three to five. Embedding proprietary third-party hardware into concrete and ceilings guarantees that by 2030, our \"smart\" buildings will be filled with obsolete, unsupported electronic waste that we can't easily rip out. We are creating a massive future liability where Kajima is on the hook for maintaining tech that the manufacturer stopped supporting a decade ago."
+                    },
+                    {
+                        speaker: "Bull",
+                        role: "Strategy Lead",
+                        avatar: "bull",
+                        text: "That obsolescence is exactly why the \"Technology Curator\" model is a massive opportunity—it forces a shift from one-time construction fees to recurring maintenance and upgrade contracts. By decoupling the \"skin\" (sensors) from the \"skeleton\" (structure), we create an \"iPhone model\" for real estate where owners pay us to upgrade their building's OS every few years. This turns a depreciation problem into a recurring revenue engine."
+                    },
+                    {
+                        speaker: "Operator",
+                        role: "Commercial Lead",
+                        avatar: "operator",
+                        text: "That sounds great in a pitch deck, but have we actually designed the access panels and wiring conduits to make swapping these sensors physically possible without shutting down the floor? If swapping a sensor requires a ladder, a screwdriver, and an electrician after hours, the labor costs will eat the entire margin of the upgrade contract. We need to verify the physical \"plug-and-play\" reality before we claim we've solved the hardware lifecycle issue."
+                    }
+                ]
+            },
+            {
+                section: "Belief 4: Causal Attribution",
+                exchanges: [
+                    {
+                        speaker: "Bear",
+                        role: "Risk Analyst",
+                        avatar: "bear",
+                        text: "This is snake oil territory; there is no scientific way for an ambient sensor to tell if an employee is stressed because of the lighting or because they're going through a divorce. If the building dims the lights because it thinks I'm stressed, but I'm actually just concentrating, the user experience fails immediately. We are promising a \"medical-grade\" diagnosis with consumer-grade tools, and when it fails, tenants will demand refunds."
+                    },
+                    {
+                        speaker: "Bull",
+                        role: "Strategy Lead",
+                        avatar: "bull",
+                        text: "We don't need medical-grade precision on the individual; we need statistical significance on the aggregate. With Kajima's WellnessGPT and enough data volume, we can filter out the noise of personal stress to identify environmental patterns that affect the herd. Even if we are only 80% accurate, that is 80% more responsive than any dumb building currently on the market, and that differentiation is defensible."
+                    },
+                    {
+                        speaker: "Operator",
+                        role: "Commercial Lead",
+                        avatar: "operator",
+                        text: "My concern is the \"false positive\" feedback loop; if the system triggers an intervention that annoys the tenants, they will ask us to turn it off, and once it's off, they stop paying the subscription. We need to test the \"annoyance threshold\" in a real office. If the automation isn't invisible and perfect, facility managers will override it manually, and our value proposition collapses to zero."
+                    }
+                ]
+            }
+        ],
+        
+        finalAssessment: {
+            summary: "Ultimately, this investment comes down to defensibility. If you believe that Kajima can create a proprietary, legally compliant data layer that proves productivity gains, you should invest—this creates a moat that traditional contractors cannot cross.",
+            goCondition: "If you believe Kajima can create a proprietary, legally compliant data layer that proves productivity gains, creating a moat that traditional contractors cannot cross.",
+            noGoCondition: "If you cannot get comfortable with the risk that Japanese privacy laws (APPI) may fundamentally block the \"active sensing\" model, or that tenants will view this as a discretionary \"nice-to-have.\""
+        }
     }
 };
 

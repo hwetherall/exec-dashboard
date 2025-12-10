@@ -4,16 +4,26 @@
  */
 
 const CONFIG = {
+    // Toggle AI recommendations on/off
+    ENABLE_AI_RECOMMENDATIONS: true,
+    
     // OpenRouter API Key
     OPENROUTER_API_KEY: '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',
     
     // Available Models
     MODELS: [
         {
-            id: 'x-ai/grok-4.1-fast:free',
+            id: 'meta-llama/llama-4-maverick',
+            name: 'Llama 4 Maverick (Groq)',
+            context: '128K',
+            description: 'Super rapid via Groq infrastructure'
+           
+        },
+        {
+            id: 'x-ai/grok-4.1-fast',
             name: 'Grok 4.1 Fast',
             context: '2M',
-            description: 'Fast and free model',
+            description: 'Fast and powerful model',
             isDefault: true
         },
         {

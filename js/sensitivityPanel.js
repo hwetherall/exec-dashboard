@@ -306,20 +306,26 @@ function renderSensitivityPanel(containerId) {
             <button class="reset-btn" id="resetBtn">Reset to Base Case</button>
         </div>
 
-        <div class="sensitivity-sliders" id="sensitivitySliders">
-            ${renderSliders()}
-        </div>
+        <div class="sensitivity-layout">
+            <div class="sensitivity-left">
+                <div class="sensitivity-sliders" id="sensitivitySliders">
+                    ${renderSliders()}
+                </div>
+            </div>
 
-        <div class="sensitivity-metric-cards" id="metricCards">
-            <!-- Will be populated by updateMetricCards -->
-        </div>
+            <div class="sensitivity-right">
+                <div class="sensitivity-metric-cards" id="metricCards">
+                    <!-- Will be populated by updateMetricCards -->
+                </div>
 
-        <div class="sensitivity-chart-container">
-            <canvas id="sensitivityChart"></canvas>
-        </div>
+                <div class="sensitivity-chart-container">
+                    <canvas id="sensitivityChart"></canvas>
+                </div>
 
-        <div class="scenario-indicator-wrapper" id="scenarioIndicator">
-            <!-- Will be populated by updateScenarioIndicator -->
+                <div class="scenario-indicator-wrapper" id="scenarioIndicator">
+                    <!-- Will be populated by updateScenarioIndicator -->
+                </div>
+            </div>
         </div>
     `;
 

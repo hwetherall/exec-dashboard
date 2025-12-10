@@ -1,7 +1,7 @@
 /**
  * Hypothesis Data Model and Initial Data
  * Based on: Wellbeing Real Estate Initiative Executive Summary - Next Steps and Action Plan
- * Version 2.0 - Updated to 6 core hypotheses
+ * Version 3.0 - Updated to 8 core hypotheses aligned with exec-10pager.md
  */
 
 // Hypothesis status enum
@@ -66,7 +66,7 @@ const OutcomeConfig = {
 
 // ═══════════════════════════════════════════════════════════════
 // INITIAL HYPOTHESES - Derived from Next Steps and Action Plan
-// Version 2.0: 6 Core Hypotheses (3 Kill Criteria + 3 Weighted)
+// Version 3.0: 8 Core Hypotheses (3 Kill Criteria + 5 Weighted)
 // ═══════════════════════════════════════════════════════════════
 
 const initialHypotheses = [
@@ -189,6 +189,44 @@ const initialHypotheses = [
         validationMethod: "Conduct external audit of 100 random WellnessGPT recommendations against medical literature (PubMed). Benchmark sensor accuracy against clinical-grade devices in controlled lab test.",
         successGate: "Data Integrity: >90% alignment with medical consensus and >85% correlation with clinical sensors.",
         failureAction: "If accuracy is low, restrict claims to 'comfort' rather than 'health.'",
+        updatedAt: null
+    },
+    {
+        id: "H007",
+        title: "Freedom-to-Operate (FTO) Clearance",
+        description: "The venture can deploy its workplace monitoring and biometric sensing technology without infringing existing patents in the crowded 'workplace monitoring' IP landscape.",
+        category: HypothesisCategory.REGULATORY,
+        type: HypothesisType.WEIGHTED,
+        owner: "",
+        suggestedOwner: "Legal / IP Counsel",
+        dueDate: null,
+        suggestedDueDays: 60,
+        status: HypothesisStatus.NOT_STARTED,
+        outcome: HypothesisOutcome.PENDING,
+        notes: "",
+        sourceSection: "Regulatory & Legal Summary",
+        validationMethod: "Commission comprehensive FTO patent search covering workplace monitoring, biometric sensing, and environmental optimization IP. Review vendor contracts for data ownership rights. Assess design-around options for any blocking patents.",
+        successGate: "IP Clearance: FTO opinion confirms no blocking patents, or viable design-around strategies exist for identified risks.",
+        failureAction: "If major blocking patents exist, negotiate licenses or pivot sensor architecture to avoid infringement.",
+        updatedAt: null
+    },
+    {
+        id: "H008",
+        title: "Sales Channel Realignment",
+        description: "The organization can establish a consultative sales overlay capable of selling intangible 'wellbeing outcomes' directly to CHROs and CFOs, bypassing traditional cost-focused procurement channels.",
+        category: HypothesisCategory.MARKET,
+        type: HypothesisType.WEIGHTED,
+        owner: "",
+        suggestedOwner: "Sales Leadership / BD",
+        dueDate: null,
+        suggestedDueDays: 45,
+        status: HypothesisStatus.NOT_STARTED,
+        outcome: HypothesisOutcome.PENDING,
+        notes: "",
+        sourceSection: "Go-to-Market / Market Relationship",
+        validationMethod: "Identify and train 2-3 sales specialists in consultative selling for wellness ROI. Develop business case templates quantifying productivity and retention benefits. Pilot new sales approach with 5 target accounts at CHRO/CFO level.",
+        successGate: "Channel Readiness: At least 2 qualified opportunities generated through new consultative channel within 45 days.",
+        failureAction: "If channel proves ineffective, consider partnering with HR/benefits consultants who already have C-suite access.",
         updatedAt: null
     }
 ];

@@ -63,7 +63,7 @@ const ChatModule = (function() {
      */
     function getModels() {
         return window.APP_CONFIG?.MODELS || [
-            { id: 'x-ai/grok-4.1-fast:free', name: 'Grok 4.1 Fast', context: '128K', isDefault: true }
+            { id: 'google/gemini-2.0-flash-001', name: 'Gemini 2.0 Flash', context: '1M', isDefault: true }
         ];
     }
 
