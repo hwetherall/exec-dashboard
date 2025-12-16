@@ -1,3 +1,13 @@
 .vercel
 js/config.js
 Example Inputs/
+@js/config.js
+openrouter_key
+OPENROUTER_API_KEY
+api_keys/
+config/keys.env
+
+# Environment variables
+.env
+.env.local
+.env.*.local

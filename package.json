@@ -1,0 +1,17 @@
+{
+  "name": "exec-summary-dashboard",
+  "version": "1.0.0",
+  "description": "Investment Memo Dashboard",
+  "scripts": {
+    "build": "node build-config.js",
+    "prebuild": "node build-config.js",
+    "dev": "node build-config.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "dotenv": "^16.3.1"
+  }
+}
+

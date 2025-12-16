@@ -40,24 +40,31 @@ This guide will walk you through deploying your Exec Summary Dashboard to Vercel
    - **Build Command**: Leave empty (static site, no build needed)
    - **Output Directory**: Leave empty (or set to `.`)
 
-### Step 3: Set Environment Variables (Important!)
+### Step 3: Set Environment Variables (Required!)
 
-Since your `config.js` contains an API key, you should:
+Your project uses environment variables to keep API keys secure:
 
-**Option A: Use Environment Variables (Recommended)**
 1. In Vercel project settings, go to **Settings** → **Environment Variables**
-2. Add: `OPENROUTER_API_KEY` = `your-api-key-here`
-3. Update your `config.js` to read from environment variables (see below)
+2. Add the following variable:
+   - **Name**: `OPENROUTER_API_KEY`
+   - **Value**: Your actual OpenRouter API key
+   - **Environments**: Select all (Production, Preview, Development)
+3. Optionally add:
+   - **Name**: `ENABLE_AI_RECOMMENDATIONS`
+   - **Value**: `true` or `false`
+   - **Environments**: Select all
 
-**Option B: Keep Current Setup**
-- Your current `config.js` will work, but the API key will be visible in the deployed code
-- This is fine for development but not recommended for production
+**Important**: The build script (`build-config.js`) will automatically inject these values into `config.js` during deployment, keeping your secrets safe.
 
 ### Step 4: Deploy
 
 1. Click **"Deploy"**
-2. Wait 1-2 minutes for deployment
-3. Your site will be live at: `https://your-project-name.vercel.app`
+2. Vercel will automatically:
+   - Install dependencies (`npm install`)
+   - Run the build script (`npm run build`) to generate `config.js`
+   - Deploy your site
+3. Wait 1-2 minutes for deployment
+4. Your site will be live at: `https://your-project-name.vercel.app`
 
 ## Method 2: Deploy via Vercel CLI (For Advanced Users)
 
@@ -73,7 +80,17 @@ npm install -g vercel
 vercel login
 ```
 
-### Step 3: Deploy
+### Step 3: Set Environment Variables
+
+Before deploying, set your environment variables:
+```bash
+vercel env add OPENROUTER_API_KEY
+```
+Enter your API key when prompted. Repeat for `ENABLE_AI_RECOMMENDATIONS` if needed.
+
+Or set them in the Vercel dashboard: **Settings** → **Environment Variables**
+
+### Step 4: Deploy
 
 From your project directory:
 ```bash
@@ -88,40 +105,55 @@ Follow the prompts:
 - Directory? **./** (press Enter)
 - Override settings? **No** (press Enter)
 
-### Step 4: Production Deploy
+The build script will automatically run and generate `config.js` from your environment variables.
+
+### Step 5: Production Deploy
 
 For production deployment:
 ```bash
 vercel --prod
 ```
 
+This will use your production environment variables set in Vercel.
+
 ## Configuration Files
 
-### vercel.json (Optional)
+### vercel.json
 
-A `vercel.json` file has been created in your project root. This ensures:
+The `vercel.json` file configures:
+- Build command: Runs `npm install && npm run build` to generate `config.js` from environment variables
 - Proper routing for your static files
-- Correct headers for security
-- Redirect rules if needed
+- Security headers
+- Asset caching
 
 ### Environment Variables Setup
 
-To use environment variables instead of hardcoded API keys:
+Your project uses a build-time approach to inject environment variables:
 
-1. **In Vercel Dashboard:**
+1. **Local Development:**
+   ```bash
+   # Copy the example file
+   cp .env.example .env
+   
+   # Edit .env and add your API key
+   OPENROUTER_API_KEY=your-actual-api-key-here
+   
+   # Generate config.js
+   npm install
+   npm run build
+   ```
+
+2. **Vercel Deployment:**
    - Go to your project → Settings → Environment Variables
    - Add: `OPENROUTER_API_KEY` with your actual key
    - Select environments: Production, Preview, Development
+   - The build script automatically injects these during deployment
 
-2. **Update config.js** to read from environment variables:
-   ```javascript
-   const CONFIG = {
-       OPENROUTER_API_KEY: window.OPENROUTER_API_KEY || 'YOUR_FALLBACK_KEY',
-       // ... rest of config
-   };
-   ```
-
-   Or use a build-time replacement (requires a build step).
+3. **How it works:**
+   - `build-config.js` reads environment variables (from `.env` locally or Vercel env vars)
+   - Generates `js/config.js` with the values injected
+   - `config.js` is gitignored, so secrets never get committed
+   - GitGuardian will no longer detect leaked secrets! ✅
 
 ## Continuous Deployment
 
@@ -143,7 +175,11 @@ Once connected to GitHub:
 - **Solution**: Ensure `vercel.json` has proper routing rules
 
 ### Issue: API key not working
-- **Solution**: Check environment variables are set correctly in Vercel dashboard
+- **Solution**: 
+  - Check environment variables are set correctly in Vercel dashboard
+  - Ensure `OPENROUTER_API_KEY` is set for the correct environment (Production/Preview)
+  - Check build logs to verify the build script ran successfully
+  - For local dev: Ensure `.env` file exists and run `npm run build`
 
 ### Issue: Assets not loading
 - **Solution**: Check file paths are relative (not absolute)
@@ -171,12 +207,38 @@ vercel ls
 vercel remove
 ```
 
+## Local Development Setup
+
+Before running locally, set up your environment:
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Create .env file from template
+cp .env.example .env
+
+# 3. Edit .env and add your API key
+# OPENROUTER_API_KEY=your-actual-key-here
+
+# 4. Generate config.js from .env
+npm run build
+
+# 5. Open index.html in your browser or use a local server
+```
+
+**Note**: Every time you change `.env`, run `npm run build` to regenerate `config.js`.
+
 ## Security Best Practices
 
 1. ✅ Never commit `config.js` with real API keys (already in `.gitignore`)
-2. ✅ Use environment variables for sensitive data
-3. ✅ Enable Vercel's security headers (configured in `vercel.json`)
-4. ✅ Use preview deployments for testing before production
+2. ✅ Never commit `.env` file (already in `.gitignore`)
+3. ✅ Use `.env.example` as a template (committed, no secrets)
+4. ✅ Use environment variables for sensitive data
+5. ✅ Build script injects env vars at build time, not runtime
+6. ✅ Enable Vercel's security headers (configured in `vercel.json`)
+7. ✅ Use preview deployments for testing before production
+8. ✅ GitGuardian will no longer detect secrets! 🎉
 
 ## Next Steps
 
